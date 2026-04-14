@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InvestGuide Pro — Maîtrise tes finances, construis ta liberté</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --bg2: #0F0F18;
+  --surface: #12121E;
+  --surface2: #1A1A2E;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #F0EEF8;
+  --muted: #8B899C;
+  --hint: #4A4860;
+  --gold: #C9A84C;
+  --gold-light: rgba(201,168,76,0.12);
+  --gold-glow: rgba(201,168,76,0.3);
+  --blue: #4F8EF7;
+  --blue-light: rgba(79,142,247,0.12);
+  --green: #3DD68C;
+  --green-light: rgba(61,214,140,0.12);
+  --red: #F75F5F;
+  --red-light: rgba(247,95,95,0.12);
+  --amber: #F7A25F;
+  --amber-light: rgba(247,162,95,0.12);
+  --purple: #9B7FEA;
+  --purple-light: rgba(155,127,234,0.12);
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Outfit', system-ui, sans-serif;
+  --r: 14px;
+  --rs: 8px;
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: .4;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--hint); border-radius: 2px; }
+
+/* ─── LAYOUT ─── */
+.app { display: flex; min-height: 100vh; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-top {
+  padding: 28px 22px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--gold) 0%, #E8C070 100%);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.logo-icon svg { width: 20px; height: 20px; stroke: #0A0A0F; fill: none; stroke-width: 2.5; }
+
+.logo-text {}
+.logo-name { font-family: var(--serif); font-size: 20px; color: var(--text); letter-spacing: -0.02em; line-height: 1; }
+.logo-tagline { font-size: 10px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 2px; }
+
+/* Search */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.search-bar:hover { border-color: var(--border2); }
+.search-bar svg { width: 14px; height: 14px; stroke: var(--hint); flex-shrink: 0; }
+.search-bar span { font-size: 13px; color: var(--hint); }
+.search-bar kbd { margin-left: auto; font-size: 10px; color: var(--hint); background: var(--surface); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 5px; font-family: var(--sans); }
+
+/* Nav */
+.nav-body { padding: 16px 12px; flex: 1; }
+.nav-section { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--hint); margin: 0 8px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 400;
+  transition: all var(--transition);
+  margin-bottom: 2px;
+  border: none; background: none; width: 100%; text-align: left;
+  position: relative;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--gold-light); color: var(--gold); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: var(--gold); border-radius: 0 2px 2px 0; }
+.nav-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-icon svg { width: 14px; height: 14px; fill: none; stroke-width: 2; }
+.nav-label { flex: 1; }
+.nav-badge { font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 10px; }
+.nav-sep { height: 1px; background: var(--border); margin: 14px 8px; }
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 16px 22px;
+  border-top: 1px solid var(--border);
+}
+.sidebar-progress {
+  margin-bottom: 14px;
+}
+.sp-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.sp-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.sp-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #E8C070); border-radius: 2px; transition: width .5s; }
+.sidebar-disclaimer { font-size: 11px; color: var(--hint); line-height: 1.5; }
+
+/* ─── MAIN ─── */
+.main { margin-left: 280px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Header */
+.topbar {
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+
+.topbar-left {}
+.topbar-title { font-family: var(--serif); font-size: 22px; letter-spacing: -0.02em; line-height: 1.1; }
+.topbar-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.badge-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 600;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid;
+}
+
+.risk-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color var(--transition);
+}
+.theme-toggle:hover { border-color: var(--border2); }
+.theme-toggle svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 2; }
+
+/* ─── CONTENT ─── */
+.content { padding: 36px 40px; flex: 1; }
+.panel { display: none; animation: fadeUp .3s ease; max-width: 980px; }
+.panel.active { display: block; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── HERO SECTION ─── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.hero-badge::before { content: ''; width: 20px; height: 1px; background: var(--hint); }
+.hero-title { font-family: var(--serif); font-size: 36px; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 10px; }
+.hero-title em { font-style: italic; color: var(--gold); }
+.hero-desc { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 560px; }
+
+.hero-meta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.meta-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 10px 14px;
+  text-align: center;
+  min-width: 100px;
+}
+.meta-val { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.meta-lbl { font-size: 10px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-top: 1px; }
+
+/* ─── RISK METER ─── */
+.risk-section { margin-bottom: 24px; }
+.risk-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.risk-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.risk-val { font-size: 12px; font-weight: 600; }
+.risk-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; position: relative; }
+.risk-fill { height: 100%; border-radius: 4px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+.risk-ticks { display: flex; justify-content: space-between; margin-top: 6px; }
+.risk-tick { font-size: 10px; color: var(--hint); }
+
+/* ─── STAT GRID ─── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.stat-icon svg { width: 16px; height: 16px; fill: none; stroke-width: 2; }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.stat-value { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.stat-sub { font-size: 11px; color: var(--hint); margin-top: 3px; }
+
+/* ─── TABS ─── */
+.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); padding: 4px; margin-bottom: 24px; width: fit-content; }
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.tab-btn.active { background: var(--surface2); color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeUp .2s ease; }
+
+/* ─── CONTENT BLOCKS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.card-title { font-family: var(--serif); font-size: 19px; letter-spacing: -0.02em; margin-bottom: 6px; }
+.card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+.card-desc + .card-desc { margin-top: 10px; }
+
+/* Info row */
+.info-row {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-radius: var(--rs);
+  margin: 12px 0;
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  align-items: flex-start;
+}
+.info-row svg { width: 16px; height: 16px; fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 2px; }
+
+/* Steps */
+.steps-grid { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+.step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0 16px;
+  position: relative;
+}
+.step:not(:last-child) .step-num-wrap::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  bottom: -8px;
+  width: 2px;
+  background: var(--border);
+}
+.step { padding-bottom: 20px; }
+.step:last-child { padding-bottom: 0; }
+.step-num-wrap { position: relative; z-index: 1; }
+.step-num {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid;
+}
+.step-body { padding-top: 8px; }
+.step-title { font-size: 14.5px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.step-tag { display: inline-flex; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-top: 8px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* Alert box */
+.alert {
+  border-radius: var(--rs);
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid;
+}
+.alert svg { width: 16px; height: 16px; fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
+.alert strong { display: block; font-weight: 600; margin-bottom: 2px; font-size: 13.5px; }
+
+/* ─── GLOSSAIRE ─── */
+.glossary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.glossary-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.glossary-item:hover { border-color: var(--gold); }
+.glossary-term { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.glossary-def { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.glossary-category { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px; }
+
+/* ─── QUIZ ─── */
+.quiz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px;
+}
+.quiz-progress { margin-bottom: 24px; }
+.qp-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.qp-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.qp-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .4s; }
+.quiz-q { font-family: var(--serif); font-size: 20px; letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.4; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-option {
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all var(--transition);
+  text-align: left;
+  background: var(--surface2);
+  color: var(--text);
+  font-family: var(--sans);
+  display: flex; align-items: center; gap: 12px;
+}
+.quiz-option:hover { border-color: var(--gold); background: var(--gold-light); }
+.quiz-option.correct { border-color: var(--green); background: var(--green-light); color: var(--green); }
+.quiz-option.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+.quiz-option.disabled { pointer-events: none; }
+.option-letter { width: 28px; height: 28px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.quiz-explanation {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--rs);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  display: none;
+}
+.quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+.quiz-score { font-size: 13px; color: var(--muted); }
+.quiz-score strong { color: var(--text); }
+
+/* ─── SIMULATEUR ─── */
+.sim-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+.sim-controls { }
+.sim-results-panel { }
+
+.slider-group { margin-bottom: 20px; }
+.slider-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.slider-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.slider-value {
+  font-size: 18px; font-weight: 700;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  background: var(--gold-light);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 6px;
+  padding: 3px 10px;
+}
+.slider-sub { font-size: 11px; color: var(--hint); margin-bottom: 8px; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 6px;
+  border-radius: 3px;
+  background: var(--surface2);
+  outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 12px var(--gold-glow);
+  transition: transform var(--transition);
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+.scenario-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.scenario-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.scenario-btn.active { background: var(--gold-light); border-color: var(--gold); color: var(--gold); }
+.scenario-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+.result-stack { display: flex; flex-direction: column; gap: 10px; }
+.result-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: border-color var(--transition);
+}
+.result-card:hover { border-color: var(--border2); }
+.result-card.featured { border-color: var(--gold); background: var(--gold-light); }
+.rc-left {}
+.rc-years { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 3px; }
+.rc-invested { font-size: 11px; color: var(--hint); margin-top: 3px; }
+.rc-right { text-align: right; }
+.rc-amount { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.rc-gain { font-size: 12px; font-weight: 600; color: var(--green); margin-top: 2px; }
+.rc-multiple { font-size: 11px; color: var(--muted); }
+
+.chart-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-top: 16px;
+  height: 200px;
+  position: relative;
+}
+
+/* ─── BROKERS ─── */
+.broker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.broker-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  transition: all var(--transition);
+}
+.broker-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.broker-card.featured { border-color: var(--gold); }
+.broker-logo { width: 36px; height: 36px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; }
+.broker-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.broker-type { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.broker-features { list-style: none; margin-bottom: 12px; }
+.broker-features li { font-size: 12px; color: var(--muted); padding: 3px 0; display: flex; gap: 6px; align-items: center; }
+.broker-features li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--hint); flex-shrink: 0; }
+.broker-score { display: flex; align-items: center; gap: 4px; }
+.broker-star { font-size: 12px; }
+.broker-score-val { font-size: 12px; font-weight: 600; color: var(--gold); }
+.broker-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* ─── COMPARATEUR TABLE ─── */
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table thead th {
+  text-align: left; padding: 12px 16px;
+  color: var(--hint); font-weight: 600; font-size: 10px;
+  text-transform: uppercase; letter-spacing: .08em;
+  border-bottom: 1px solid var(--border);
+}
+.compare-table tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+.compare-table tbody tr:hover { background: var(--surface2); }
+.compare-table tbody tr:last-child { border-bottom: none; }
+.compare-table td { padding: 14px 16px; vertical-align: middle; }
+.ct-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+.ct-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.ct-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.ct-stars { color: var(--gold); letter-spacing: 1px; font-size: 12px; }
+.ct-rec { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+
+/* ─── ACTUALITES ─── */
+.news-grid { display: grid; gap: 12px; }
+.news-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.news-card:hover { border-color: var(--border2); }
+.news-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
+.news-title { font-size: 14.5px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+.news-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.news-meta { font-size: 11px; color: var(--hint); margin-top: 10px; display: flex; gap: 12px; }
+.news-img { width: 80px; height: 80px; border-radius: var(--rs); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+
+/* ─── PORTFOLIO BUILDER ─── */
+.alloc-builder { }
+.alloc-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.alloc-label { width: 120px; font-size: 13px; color: var(--muted); }
+.alloc-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+input.alloc-range { flex: 1; }
+.alloc-pct { width: 44px; text-align: right; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.alloc-total { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.alloc-total.ok { color: var(--green); }
+.alloc-total.over { color: var(--red); }
+.donut-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 20px; }
+.portfolio-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.ps-card { background: var(--surface2); border-radius: var(--rs); padding: 12px; text-align: center; }
+.ps-val { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2px; }
+.ps-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* ─── FISCALITE ─── */
+.fiscalite-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.fiscalite-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+}
+.fc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.fc-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.fc-icon svg { width: 18px; height: 18px; fill: none; stroke-width: 2; }
+.fc-title { font-size: 15px; font-weight: 600; }
+.fc-rate { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+.fc-detail { font-size: 12px; color: var(--muted); line-height: 1.55; }
+.fc-feature { display: flex; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--muted); align-items: flex-start; }
+.fc-feature::before { content: '→'; color: var(--hint); flex-shrink: 0; }
+
+/* ─── CTA BUTTON ─── */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--rs); font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition); border: none; }
+.btn-primary { background: var(--gold); color: #0A0A0F; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--gold-glow); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--border2); }
+.btn svg { width: 14px; height: 14px; }
+
+/* ─── SECTION DIVIDER ─── */
+.section-sep { display: flex; align-items: center; gap: 12px; margin: 28px 0 20px; }
+.section-sep-line { flex: 1; height: 1px; background: var(--border); }
+.section-sep-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--hint); }
+
+/* ─── TOOLTIP ─── */
+.tooltip-wrap { position: relative; display: inline-flex; }
+.tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted); cursor: help; }
+.tooltip-box {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--rs); padding: 10px 12px;
+  font-size: 12px; color: var(--muted); line-height: 1.55;
+  width: 220px; pointer-events: none;
+  opacity: 0; transition: opacity var(--transition);
+  z-index: 200; white-space: normal;
+}
+.tooltip-wrap:hover .tooltip-box { opacity: 1; }
+
+/* ─── SEARCH MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 500;
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 80px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  width: 100%; max-width: 560px;
+  overflow: hidden;
+  animation: fadeUp .15s ease;
+}
+.modal-search-bar { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.modal-search-bar svg { width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.modal-search-input { flex: 1; background: none; border: none; outline: none; font-family: var(--sans); font-size: 15px; color: var(--text); }
+.modal-search-input::placeholder { color: var(--hint); }
+.modal-results { padding: 8px; max-height: 360px; overflow-y: auto; }
+.modal-result {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px 12px; border-radius: var(--rs);
+  cursor: pointer; transition: background var(--transition);
+}
+.modal-result:hover { background: var(--surface2); }
+.modal-result-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.modal-result-label { font-size: 13.5px; font-weight: 500; }
+.modal-result-sub { font-size: 11.5px; color: var(--muted); }
+.modal-footer { padding: 10px 20px; border-top: 1px solid var(--border); display: flex; gap: 16px; font-size: 11px; color: var(--hint); }
+.modal-footer kbd { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 6px; font-family: var(--sans); }
+
+/* ─── MOBILE ─── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 20px 16px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .sim-layout { grid-template-columns: 1fr; }
+  .broker-grid { grid-template-columns: 1fr; }
+  .fiscalite-grid { grid-template-columns: 1fr; }
+  .glossary-grid { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-meta { flex-direction: row; align-items: flex-start; }
+  .topbar { padding: 14px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Search Modal -->
+<div class="modal-overlay" id="searchModal" onclick="if(event.target===this)closeSearch()">
+  <div class="modal-box">
+    <div class="modal-search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="modal-search-input" id="searchInput" placeholder="Rechercher un actif, terme, concept..." oninput="filterSearch(this.value)" autofocus>
+      <kbd onclick="closeSearch()" style="cursor:pointer">Esc</kbd>
+    </div>
+    <div class="modal-results" id="searchResults">
+      <div class="modal-result" onclick="navigate('actions');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--blue-light)">📈</div>
+        <div><div class="modal-result-label">Actions & Bourse</div><div class="modal-result-sub">Devenir actionnaire d'entreprises cotées</div></div>
+      </div>
+      <div class="modal-result" onclick="navigate('etf');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--green-light)">🗂️</div>
+        <div><div class="modal-result-label">ETF & Fonds indiciels</div><div class="modal-result-sub">La méthode des investisseurs passifs</div></div>
+      </div>
+      <div class="modal-result" onclick="navigate('crypto');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--red-light)">₿</div>
+        <div><div class="modal-result-label">Cryptomonnaies</div><div class="modal-result-sub">Bitcoin, Ethereum et les risques</div></div>
+      </div>
+      <div class="modal-result" onclick="navigate('obligations');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--amber-light)">🏛️</div>
+        <div><div class="modal-result-label">Obligations</div><div class="modal-result-sub">Prêter à des États et entreprises</div></div>
+      </div>
+      <div class="modal-result" onclick="navigate('simulateur');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--purple-light)">🧮</div>
+        <div><div class="modal-result-label">Simulateur d'épargne</div><div class="modal-result-sub">Projette tes investissements</div></div>
+      </div>
+      <div class="modal-result" onclick="navigate('glossaire');closeSearch()">
+        <div class="modal-result-icon" style="background:var(--gold-light)">📚</div>
+        <div><div class="modal-result-label">Glossaire financier</div><div class="modal-result-sub">60+ termes expliqués simplement</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span><kbd>↵</kbd> Ouvrir</span>
+      <span><kbd>↑↓</kbd> Naviguer</span>
+      <span><kbd>Esc</kbd> Fermer</span>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name">InvestGuide</div>
+        <div class="logo-tagline">Éducation financière</div>
+      </div>
+    </div>
+    <div class="search-bar" onclick="openSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Rechercher...</span>
+      <kbd>⌘K</kbd>
+    </div>
+  </div>
+
+  <div class="nav-body">
+    <div class="nav-section">Actifs financiers</div>
+    <button class="nav-item active" id="nav-actions" onclick="navigate('actions')">
+      <div class="nav-icon" style="background:var(--blue-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--blue)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <span class="nav-label">Actions & Bourse</span>
+    </button>
+    <button class="nav-item" id="nav-etf" onclick="navigate('etf')">
+      <div class="nav-icon" style="background:var(--green-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--green)"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <span class="nav-label">ETF</span>
+      <span class="nav-badge" style="background:var(--green-light);color:var(--green)">Recommandé</span>
+    </button>
+    <button class="nav-item" id="nav-crypto" onclick="navigate('crypto')">
+      <div class="nav-icon" style="background:var(--red-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--red)"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h3.5a2 2 0 0 1 0 4H9.5V8zm0 4h4a2 2 0 0 1 0 4H9.5v-4z"/></svg>
+      </div>
+      <span class="nav-label">Cryptomonnaies</span>
+    </button>
+    <button class="nav-item" id="nav-obligations" onclick="navigate('obligations')">
+      <div class="nav-icon" style="background:var(--amber-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--amber)"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="nav-label">Obligations</span>
+    </button>
+    <button class="nav-item" id="nav-matieres" onclick="navigate('matieres')">
+      <div class="nav-icon" style="background:rgba(180,180,180,0.1)">
+        <svg viewBox="0 0 24 24" stroke="#9CA3AF"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>
+      </div>
+      <span class="nav-label">Matières premières</span>
+    </button>
+    <button class="nav-item" id="nav-immo" onclick="navigate('immo')">
+      <div class="nav-icon" style="background:rgba(120,90,200,0.12)">
+        <svg viewBox="0 0 24 24" stroke="#9B7FEA"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span class="nav-label">Immobilier (SCPI)</span>
+    </button>
+
+    <div class="nav-sep"></div>
+    <div class="nav-section">Comprendre</div>
+
+    <button class="nav-item" id="nav-fiscalite" onclick="navigate('fiscalite')">
+      <div class="nav-icon" style="background:rgba(248,161,63,0.1)">
+        <svg viewBox="0 0 24 24" stroke="#F7A25F"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <span class="nav-label">Fiscalité & Impôts</span>
+    </button>
+    <button class="nav-item" id="nav-glossaire" onclick="navigate('glossaire')">
+      <div class="nav-icon" style="background:var(--gold-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--gold)"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <span class="nav-label">Glossaire</span>
+    </button>
+    <button class="nav-item" id="nav-quiz" onclick="navigate('quiz')">
+      <div class="nav-icon" style="background:var(--blue-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--blue)"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <span class="nav-label">Quiz financier</span>
+      <span class="nav-badge" style="background:var(--blue-light);color:var(--blue)">Nouveau</span>
+    </button>
+
+    <div class="nav-sep"></div>
+    <div class="nav-section">Outils</div>
+
+    <button class="nav-item" id="nav-simulateur" onclick="navigate('simulateur')">
+      <div class="nav-icon" style="background:var(--purple-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--purple)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <span class="nav-label">Simulateur</span>
+    </button>
+    <button class="nav-item" id="nav-portfolio" onclick="navigate('portfolio')">
+      <div class="nav-icon" style="background:var(--green-light)">
+        <svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      </div>
+      <span class="nav-label">Constructeur de portfolio</span>
+    </button>
+    <button class="nav-item" id="nav-comparateur" onclick="navigate('comparateur')">
+      <div class="nav-icon" style="background:rgba(80,200,180,0.12)">
+        <svg viewBox="0 0 24 24" stroke="#3DD6B5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <span class="nav-label">Comparateur</span>
+    </button>
+    <button class="nav-item" id="nav-actualites" onclick="navigate('actualites')">
+      <div class="nav-icon" style="background:rgba(247,95,95,0.1)">
+        <svg viewBox="0 0 24 24" stroke="var(--red)"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>
+      </div>
+      <span class="nav-label">Actualités</span>
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-progress">
+      <div class="sp-label"><span>Progression</span><span id="progressPct">0%</span></div>
+      <div class="sp-track"><div class="sp-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="sidebar-disclaimer">Outil éducatif uniquement. Pas un conseil en investissement. Fais tes propres recherches.</div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+
+  <div class="topbar" id="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbarTitle">Actions & Bourse</div>
+      <div class="topbar-sub" id="topbarSub">Devenir actionnaire d'une entreprise cotée</div>
+    </div>
+    <div class="topbar-right">
+      <span class="badge-pill" id="topbarBadge" style="background:var(--blue-light);color:var(--blue);border-color:rgba(79,142,247,0.2)">
+        <span class="risk-dot" style="background:var(--blue)"></span>
+        Risque moyen-élevé
+      </span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════ ACTIONS ═══════ -->
+    <div class="panel active" id="panel-actions">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Actif financier · Marchés cotés</div>
+          <div class="hero-title">La Bourse :<br><em>devenir propriétaire</em></div>
+          <div class="hero-desc">Quand tu achètes une action, tu achètes une fraction d'entreprise. Tu participes à sa croissance, ses bénéfices, et parfois tu reçois des dividendes. C'est l'actif moteur de la création de richesse sur le long terme.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card">
+            <div class="meta-val" style="color:var(--green)">+7–10%</div>
+            <div class="meta-lbl">Rendement / an</div>
+          </div>
+          <div class="meta-card">
+            <div class="meta-val">5+ ans</div>
+            <div class="meta-lbl">Horizon min.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <div class="risk-header">
+          <span class="risk-title">Niveau de risque</span>
+          <span class="risk-val" style="color:var(--blue)">Moyen-élevé</span>
+        </div>
+        <div class="risk-track"><div class="risk-fill" style="width:65%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red))"></div></div>
+        <div class="risk-ticks"><span class="risk-tick">Très faible</span><span class="risk-tick">Faible</span><span class="risk-tick">Modéré</span><span class="risk-tick">Élevé</span><span class="risk-tick">Très élevé</span></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <div class="stat-label">Rendement historique</div>
+          <div class="stat-value" style="color:var(--green)">~8% / an</div>
+          <div class="stat-sub">Moyenne S&P 500, 50 ans</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" stroke="var(--blue)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-label">Horizon minimum</div>
+          <div class="stat-value">5 ans</div>
+          <div class="stat-sub">Idéalement 10-20 ans</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="stat-label">Risque de tout perdre</div>
+          <div class="stat-value" style="color:var(--green)">Quasi nul</div>
+          <div class="stat-sub">Si diversifié sur 10+ actions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-light)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-label">Montant minimum</div>
+          <div class="stat-value">Dès 1 €</div>
+          <div class="stat-sub">Actions fractionnées disponibles</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-actions-comprendre')">Comprendre</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-actions-demarrer')">Démarrer</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-actions-strategies')">Stratégies</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-actions-risques')">Risques</button>
+      </div>
+
+      <div class="tab-content active" id="tab-actions-comprendre">
+        <div class="card">
+          <div class="card-title">Qu'est-ce qu'une action ?</div>
+          <p class="card-desc">Une action représente une fraction de la propriété d'une entreprise. Si Apple émet 10 milliards d'actions et que tu en achètes 10, tu possèdes 0,0000001% d'Apple. Tu as droit à ta part des bénéfices (dividendes) et ta part vaut plus si l'entreprise vaut plus.</p>
+          <p class="card-desc">La grande peur des débutants ? "Et si je perds tout ?" En réalité, pour perdre tout ton argent sur une action, l'entreprise doit faire faillite complète. Pour perdre tout sur un portefeuille diversifié, il faudrait que toutes tes entreprises fassent faillite simultanément. Historiquement, ça ne s'est jamais produit sur les marchés développés.</p>
+        </div>
+
+        <div class="info-row" style="border-left:3px solid var(--blue)">
+          <svg viewBox="0 0 24 24" stroke="var(--blue)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div><strong style="color:var(--text);font-size:13.5px">Comprendre la valeur d'une action</strong><br>La valeur d'une action est déterminée par les anticipations des investisseurs sur les bénéfices futurs de l'entreprise. Si le marché pense qu'Apple gagnera plus d'argent à l'avenir, le cours monte. C'est pour ça que les résultats trimestriels font parfois bondir ou chuter les cours de 5-10% en une journée.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Les deux façons de gagner de l'argent</div>
+          <div class="steps-grid" style="margin-top:16px">
+            <div class="step">
+              <div class="step-num-wrap">
+                <div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">1</div>
+              </div>
+              <div class="step-body">
+                <div class="step-title">La plus-value (capital gain)</div>
+                <div class="step-desc">Tu achètes une action 100€, elle vaut 150€ dans 5 ans. Tu la vends et tu empoches 50€ de bénéfice. C'est la source principale de revenus sur les actions de croissance (tech, biotech, etc.)</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap">
+                <div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">2</div>
+              </div>
+              <div class="step-body">
+                <div class="step-title">Les dividendes</div>
+                <div class="step-desc">Certaines entreprises distribuent une partie de leurs bénéfices aux actionnaires, généralement chaque trimestre ou chaque année. LVMH, Total, BNP versent des dividendes. C'est un revenu passif régulier, même si le cours stagne.</div>
+                <span class="step-tag" style="background:var(--gold-light);color:var(--gold)">Rendement moyen en France : 3-5% / an</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-actions-demarrer">
+        <div class="card">
+          <div class="card-title">Le chemin en 4 étapes</div>
+          <div class="steps-grid" style="margin-top:16px">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">1</div></div>
+              <div class="step-body">
+                <div class="step-title">Ouvre un PEA — ton arme fiscale principale</div>
+                <div class="step-desc">Le Plan d'Épargne en Actions est l'enveloppe fiscale la plus puissante pour les actions en France. Après 5 ans de détention, tes plus-values ne sont imposées qu'à 17,2% (contre 30% en compte ordinaire). Limite : 150 000€ de versements. Accessible dès 18 ans. À ouvrir en priorité absolue.</div>
+                <span class="step-tag" style="background:var(--green-light);color:var(--green)">Économie fiscale jusqu'à 12,8% par rapport à un CTO</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">2</div></div>
+              <div class="step-body">
+                <div class="step-title">Choisis un courtier sans frais</div>
+                <div class="step-desc">Les frais tuent silencieusement ta performance. 1% de frais annuels de plus, c'est 26% de capital en moins sur 30 ans. Utilise Trade Republic, Boursorama ou Fortuneo — tous proposent des PEA gratuits ou à très faibles frais.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">3</div></div>
+              <div class="step-body">
+                <div class="step-title">Constitue d'abord une épargne de précaution</div>
+                <div class="step-desc">Avant d'investir en bourse, garde 3 à 6 mois de dépenses sur un Livret A ou LDDS. Cet argent doit être intouchable et disponible en cas d'urgence. Tu n'investis en bourse que l'argent dont tu n'auras pas besoin dans les 5 ans minimum.</div>
+                <span class="step-tag" style="background:var(--amber-light);color:var(--amber)">Règle d'or : n'investis que ce que tu peux te permettre de ne pas toucher</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">4</div></div>
+              <div class="step-body">
+                <div class="step-title">Programme des virements mensuels automatiques</div>
+                <div class="step-desc">La stratégie DCA (Dollar Cost Averaging) : investir régulièrement une somme fixe, peu importe les conditions de marché. Tu achètes plus de parts quand les prix sont bas, moins quand ils sont hauts. Sur 10-20 ans, cette discipline dépasse 90% des investisseurs professionnels.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-actions-strategies">
+        <div class="card">
+          <div class="card-title">3 approches selon ton profil</div>
+          <div class="steps-grid" style="margin-top:16px">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">A</div></div>
+              <div class="step-body">
+                <div class="step-title">L'investisseur passif (recommandé)</div>
+                <div class="step-desc">100% ETF monde + virements mensuels automatiques. Aucune décision à prendre. 30 minutes de gestion par an maximum. Les recherches académiques montrent qu'à long terme, les fonds indiciels battent 85-90% des gérants actifs, nets de frais.</div>
+                <span class="step-tag" style="background:var(--green-light);color:var(--green)">Pour 90% des investisseurs particuliers</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">B</div></div>
+              <div class="step-body">
+                <div class="step-title">L'investisseur semi-actif</div>
+                <div class="step-desc">70-80% ETF comme base + 20-30% d'actions individuelles sur des entreprises que tu comprends et analyses. Tu peux surperformer si tu fais bien ton travail, mais c'est chronophage et risqué. Apprends à lire un bilan avant de te lancer.</div>
+                <span class="step-tag" style="background:var(--blue-light);color:var(--blue)">Requiert des connaissances en analyse fondamentale</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--amber-light);color:var(--amber);border-color:var(--amber)">C</div></div>
+              <div class="step-body">
+                <div class="step-title">L'investisseur value (comme Buffett)</div>
+                <div class="step-desc">Identifier des entreprises de qualité sous-évaluées par le marché et les acheter avec une "marge de sécurité". Stratégie de Warren Buffett. Demande une analyse approfondie des bilans, compte de résultat, flux de trésorerie, avantages concurrentiels.</div>
+                <span class="step-tag" style="background:var(--amber-light);color:var(--amber)">Pour investisseurs expérimentés</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-actions-risques">
+        <div class="alert" style="background:var(--amber-light);border-color:rgba(247,162,95,0.3);color:var(--amber)">
+          <svg viewBox="0 0 24 24" stroke="var(--amber)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div><strong>Les risques réels à connaître</strong>Ces risques sont réels mais maîtrisables avec les bonnes pratiques.</div>
+        </div>
+        <div class="card">
+          <div class="steps-grid">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">!</div></div>
+              <div class="step-body">
+                <div class="step-title">Risque de marché (systémique)</div>
+                <div class="step-desc">Une crise (2008, Covid 2020) peut faire chuter les marchés de 30-50%. Solution : horizon long terme. Chaque krach de l'histoire a été suivi d'un rebond. Le marché américain a récupéré toutes ses pertes historiquement.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">!</div></div>
+              <div class="step-body">
+                <div class="step-title">Risque spécifique (action individuelle)</div>
+                <div class="step-desc">Une entreprise peut faire faillite (Enron, Lehman Brothers, Wirecard). Solution : ne jamais mettre plus de 5% sur une seule action. Un ETF élimine ce risque par construction.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--amber-light);color:var(--amber);border-color:var(--amber)">?</div></div>
+              <div class="step-body">
+                <div class="step-title">Risque comportemental (le plus dangereux)</div>
+                <div class="step-desc">Vendre en panique lors d'un krach, acheter après une forte hausse par FOMO. C'est le risque que les investisseurs s'infligent eux-mêmes. Solution : automatiser, ignorer les bruits du marché, ne pas regarder son portefeuille tous les jours.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ ETF ═══════ -->
+    <div class="panel" id="panel-etf">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Fonds indiciel · Méthode passive</div>
+          <div class="hero-title">Les ETF :<br><em>l'intelligence collective</em></div>
+          <div class="hero-desc">Un ETF regroupe des centaines ou milliers d'actions dans un seul produit. Tu achètes la diversification instantanée. C'est la stratégie préférée des économistes et validée par 50 ans de recherche académique.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--green)">~8%</div><div class="meta-lbl">MSCI World / an</div></div>
+          <div class="meta-card"><div class="meta-val">0,12%</div><div class="meta-lbl">Frais annuels</div></div>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <div class="risk-header"><span class="risk-title">Niveau de risque</span><span class="risk-val" style="color:var(--green)">Modéré</span></div>
+        <div class="risk-track"><div class="risk-fill" style="width:38%;background:linear-gradient(90deg,var(--green),var(--amber))"></div></div>
+        <div class="risk-ticks"><span class="risk-tick">Très faible</span><span class="risk-tick">Faible</span><span class="risk-tick">Modéré</span><span class="risk-tick">Élevé</span><span class="risk-tick">Très élevé</span></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="stat-label">Diversification</div>
+          <div class="stat-value" style="color:var(--green)">Maximale</div>
+          <div class="stat-sub">Jusqu'à 1 500 entreprises</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-label">Frais de gestion</div>
+          <div class="stat-value">0,07–0,3%</div>
+          <div class="stat-sub">Contre 1,5-2% pour les fonds actifs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" stroke="var(--blue)"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+          <div class="stat-label">Performance 20 ans</div>
+          <div class="stat-value" style="color:var(--green)">+340%</div>
+          <div class="stat-sub">MSCI World, hors inflation</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" stroke="var(--purple)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-label">Temps de gestion</div>
+          <div class="stat-value">30 min/an</div>
+          <div class="stat-sub">Stratégie entièrement passive</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-etf-quoi')">Quoi choisir</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-etf-comment')">Comment investir</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-etf-types')">Types d'ETF</button>
+      </div>
+
+      <div class="tab-content active" id="tab-etf-quoi">
+        <div class="card">
+          <div class="card-title">Les 5 ETF de référence</div>
+          <div style="overflow-x:auto;margin-top:16px">
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+              <thead><tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Nom</th>
+                <th style="padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Indice</th>
+                <th style="padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Entreprises</th>
+                <th style="padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Frais</th>
+                <th style="padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">PEA</th>
+                <th style="padding:8px 12px;color:var(--hint);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.06em">Pour qui</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
+                  <td style="padding:12px;font-weight:600">Amundi MSCI World</td>
+                  <td style="padding:12px;color:var(--muted)">MSCI World</td>
+                  <td style="padding:12px;font-weight:500">1 500</td>
+                  <td style="padding:12px;color:var(--green);font-weight:600">0,12%</td>
+                  <td style="padding:12px;color:var(--green)">✓</td>
+                  <td style="padding:12px"><span style="background:var(--green-light);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">Débutant</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:12px;font-weight:600">Lyxor S&P 500</td>
+                  <td style="padding:12px;color:var(--muted)">S&P 500</td>
+                  <td style="padding:12px;font-weight:500">500</td>
+                  <td style="padding:12px;color:var(--green);font-weight:600">0,07%</td>
+                  <td style="padding:12px;color:var(--green)">✓</td>
+                  <td style="padding:12px"><span style="background:var(--blue-light);color:var(--blue);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">USA focus</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);background:var(--surface2)">
+                  <td style="padding:12px;font-weight:600">Amundi CAC 40</td>
+                  <td style="padding:12px;color:var(--muted)">CAC 40</td>
+                  <td style="padding:12px;font-weight:500">40</td>
+                  <td style="padding:12px;color:var(--green);font-weight:600">0,25%</td>
+                  <td style="padding:12px;color:var(--green)">✓</td>
+                  <td style="padding:12px"><span style="background:var(--amber-light);color:var(--amber);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">France only</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:12px;font-weight:600">iShares EM</td>
+                  <td style="padding:12px;color:var(--muted)">MSCI Emerging</td>
+                  <td style="padding:12px;font-weight:500">800+</td>
+                  <td style="padding:12px;color:var(--amber);font-weight:600">0,18%</td>
+                  <td style="padding:12px;color:var(--red)">✗</td>
+                  <td style="padding:12px"><span style="background:var(--amber-light);color:var(--amber);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">Marchés émerg.</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:12px;font-weight:600">Amundi MSCI World ESG</td>
+                  <td style="padding:12px;color:var(--muted)">MSCI World ESG</td>
+                  <td style="padding:12px;font-weight:500">700+</td>
+                  <td style="padding:12px;color:var(--amber);font-weight:600">0,18%</td>
+                  <td style="padding:12px;color:var(--green)">✓</td>
+                  <td style="padding:12px"><span style="background:var(--green-light);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">ISR / éthique</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-etf-comment">
+        <div class="card">
+          <div class="steps-grid">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">1</div></div>
+              <div class="step-body">
+                <div class="step-title">La stratégie DCA (l'arme secrète)</div>
+                <div class="step-desc">Investis une somme fixe chaque mois, automatiquement. 100€ le 1er de chaque mois. Pas de décision, pas d'émotion. En achetant régulièrement, tu lisses ton prix d'achat sur les hauts et les bas du marché. Sur 20 ans, cette discipline simple dépasse 90% des investisseurs actifs.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">2</div></div>
+              <div class="step-body">
+                <div class="step-title">ETF capitalisant vs distribuant</div>
+                <div class="step-desc">Un ETF "capitalisant" (Acc) réinvestit automatiquement les dividendes dans le fonds — effet boule de neige maximum. Un ETF "distribuant" (Dist) te verse les dividendes en cash. Pour un jeune investisseur, capitalisant est préférable : moins d'impôts à payer immédiatement et plus d'intérêts composés.</div>
+                <span class="step-tag" style="background:var(--gold-light);color:var(--gold)">Cherche "Acc" dans le nom de l'ETF</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">3</div></div>
+              <div class="step-body">
+                <div class="step-title">Ne rééquilibre pas trop souvent</div>
+                <div class="step-desc">L'erreur classique : rééquilibrer son portefeuille chaque mois en vendant les gagnants et achetant les perdants. Ça génère des frais et des impôts. Rééquilibre une fois par an maximum, idéalement en ajoutant du capital plutôt qu'en vendant.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-etf-types">
+        <div class="card">
+          <div class="card-title">ETF physiques vs synthétiques</div>
+          <div class="steps-grid" style="margin-top:16px">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">P</div></div>
+              <div class="step-body">
+                <div class="step-title">ETF physique (réplication directe)</div>
+                <div class="step-desc">Le fonds achète vraiment les actions sous-jacentes. Plus transparent. Moins de risque de contrepartie. La plupart des ETF iShares et Vanguard sont physiques.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">S</div></div>
+              <div class="step-body">
+                <div class="step-title">ETF synthétique (via swap)</div>
+                <div class="step-desc">Le fonds utilise des dérivés financiers pour répliquer l'indice sans acheter les actions. Avantage : peut être éligible PEA même pour des indices non-européens (ex: S&P 500 en PEA). Les ETF Amundi MSCI World sont souvent synthétiques.</div>
+                <span class="step-tag" style="background:var(--blue-light);color:var(--blue)">Permet l'accès au S&P 500 via PEA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ CRYPTO ═══════ -->
+    <div class="panel" id="panel-crypto">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Actif numérique · Très haute volatilité</div>
+          <div class="hero-title">Cryptomonnaies :<br><em>la vérité sans filtre</em></div>
+          <div class="hero-desc">Bitcoin et Ethereum sont des actifs numériques décentralisés avec un potentiel de gain élevé — et un risque de perte totale réel. Pas de banque centrale pour les sauver. Voici ce que tu dois absolument savoir avant d'y toucher.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--red)">-80%</div><div class="meta-lbl">Pire bear market</div></div>
+          <div class="meta-card"><div class="meta-val" style="color:var(--green)">+1000%</div><div class="meta-lbl">Meilleur bull market</div></div>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <div class="risk-header"><span class="risk-title">Niveau de risque</span><span class="risk-val" style="color:var(--red)">Très élevé</span></div>
+        <div class="risk-track"><div class="risk-fill" style="width:93%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red))"></div></div>
+        <div class="risk-ticks"><span class="risk-tick">Très faible</span><span class="risk-tick">Faible</span><span class="risk-tick">Modéré</span><span class="risk-tick">Élevé</span><span class="risk-tick">Très élevé</span></div>
+      </div>
+
+      <div class="alert" style="background:var(--red-light);border-color:rgba(247,95,95,0.3);color:var(--red)">
+        <svg viewBox="0 0 24 24" stroke="var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div><strong>Règle absolue</strong>N'investis en crypto que ce que tu acceptes de perdre ENTIÈREMENT. Si te voir perdre cette somme te stresserait, c'est trop. Maximum 5-10% de ton portfolio total.</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--red-light)"><svg viewBox="0 0 24 24" stroke="var(--red)"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div>
+          <div class="stat-label">Peut-on tout perdre ?</div>
+          <div class="stat-value" style="color:var(--red)">Oui</div>
+          <div class="stat-sub">Pour les altcoins surtout</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-light)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="stat-label">Volatilité annuelle</div>
+          <div class="stat-value" style="color:var(--red)">50-80%</div>
+          <div class="stat-sub">Vs 15-20% pour les actions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" stroke="var(--blue)"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <div class="stat-label">Fiscalité France</div>
+          <div class="stat-value">30%</div>
+          <div class="stat-sub">Flat tax sur chaque cession</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="stat-label">Allocation recommandée</div>
+          <div class="stat-value">Max 5-10%</div>
+          <div class="stat-sub">Du portfolio total</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-crypto-comprendre')">Comprendre</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-crypto-lancer')">Se lancer</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-crypto-arnaques')">⚠️ Arnaques</button>
+      </div>
+
+      <div class="tab-content active" id="tab-crypto-comprendre">
+        <div class="card">
+          <div class="card-title">Bitcoin vs Ethereum : les différences clés</div>
+          <div class="steps-grid" style="margin-top:16px">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--amber-light);color:var(--amber);border-color:var(--amber)">₿</div></div>
+              <div class="step-body">
+                <div class="step-title">Bitcoin (BTC) — la réserve de valeur</div>
+                <div class="step-desc">Créé en 2009 par Satoshi Nakamoto. Offre limitée à 21 millions d'unités. Aucune entité ne peut en créer plus. Considéré comme "l'or numérique" — une réserve de valeur décentralisée. C'est le plus sûr (relativement) des cryptoactifs.</div>
+                <span class="step-tag" style="background:var(--amber-light);color:var(--amber)">Capitalisation : ~1 400 milliards $</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--purple-light);color:var(--purple);border-color:var(--purple)">Ξ</div></div>
+              <div class="step-body">
+                <div class="step-title">Ethereum (ETH) — la plateforme</div>
+                <div class="step-desc">C'est le "pétrole" de l'écosystème crypto. Ethereum permet les smart contracts, les applications décentralisées (DeFi), les NFT. Plus risqué que Bitcoin mais plus polyvalent techniquement. Offre non plafonnée mais avec un mécanisme de destruction (burn).</div>
+                <span class="step-tag" style="background:var(--purple-light);color:var(--purple)">Technologie smart contracts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-crypto-lancer">
+        <div class="card">
+          <div class="steps-grid">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">1</div></div>
+              <div class="step-body">
+                <div class="step-title">Plateforme régulée AMF uniquement</div>
+                <div class="step-desc">En France, utilise uniquement des plateformes enregistrées comme PSAN (Prestataire de Services sur Actifs Numériques) auprès de l'AMF : Coinbase, Kraken, Binance France. Fuis les plateformes sans adresse connue ou avec des promesses de rendements garantis.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">2</div></div>
+              <div class="step-body">
+                <div class="step-title">Active l'authentification 2 facteurs (2FA)</div>
+                <div class="step-desc">Utilise une application d'authentification (Google Authenticator, Authy) — jamais le SMS seul. Un hacker peut cloner ta carte SIM. Active aussi une adresse email dédiée uniquement à ta crypto que tu n'utilises pour rien d'autre.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">3</div></div>
+              <div class="step-body">
+                <div class="step-title">Déclare TOUT aux impôts</div>
+                <div class="step-desc">Chaque vente de crypto (même crypto-vers-crypto) déclenche un événement fiscal en France. Tu dois déclarer via le formulaire 2086. Les plateformes transmettent tes données à l'administration fiscale. En cas de contrôle, l'amende peut dépasser les gains non déclarés.</div>
+                <span class="step-tag" style="background:var(--red-light);color:var(--red)">Flat tax 30% sur chaque cession profitable</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-crypto-arnaques">
+        <div class="alert" style="background:var(--red-light);border-color:rgba(247,95,95,0.3);color:var(--red)">
+          <svg viewBox="0 0 24 24" stroke="var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div><strong>Les arnaques les plus courantes en 2024</strong>Elles coûtent des milliards chaque année aux particuliers.</div>
+        </div>
+        <div class="card">
+          <div class="steps-grid">
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">🚨</div></div>
+              <div class="step-body">
+                <div class="step-title">Le "rug pull" — la fuite avec la caisse</div>
+                <div class="step-desc">Des développeurs créent un nouveau token, font monter le prix artificiellement avec de faux partenariats et une communauté fabriquée, puis vendent tout d'un coup. Le cours s'effondre à zéro en quelques minutes. Règle : évite TOUT altcoin dont tu ne connais pas les fondateurs réels et vérifiables.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--red-light);color:var(--red);border-color:var(--red)">🚨</div></div>
+              <div class="step-body">
+                <div class="step-title">Le "pig butchering" (abattage du cochon)</div>
+                <div class="step-desc">Une personne sympathique te contacte sur les réseaux sociaux ou WhatsApp, développe une relation de confiance sur des semaines, puis t'invite à investir sur "sa" plateforme de trading crypto. Tu vois tes gains monter (faux). Quand tu veux retirer, on te demande des "frais". Tout est perdu.</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num-wrap"><div class="step-num" style="background:var(--amber-light);color:var(--amber);border-color:var(--amber)">⚠️</div></div>
+              <div class="step-body">
+                <div class="step-title">Les "influenceurs" et le pump & dump</div>
+                <div class="step-desc">Un influenceur avec 500k abonnés fait la promotion d'une crypto. Il est payé pour ça (souvent sans le dire). La crypto monte, il vend ses propres tokens pendant que ses abonnés achètent. Méfie-toi de toute recommandation sur les réseaux sociaux.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ OBLIGATIONS ═══════ -->
+    <div class="panel" id="panel-obligations">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Revenu fixe · Actif défensif</div>
+          <div class="hero-title">Obligations :<br><em>prêter pour percevoir</em></div>
+          <div class="hero-desc">Une obligation est un prêt que tu accordes à un État ou une entreprise. Tu reçois un intérêt fixe (coupon) pendant toute la durée, puis récupères ton capital. Moins rentable que les actions sur le long terme, mais indispensable pour stabiliser un portfolio.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--amber)">~3,2%</div><div class="meta-lbl">OAT France 10 ans</div></div>
+          <div class="meta-card"><div class="meta-val" style="color:var(--green)">Faible</div><div class="meta-lbl">Risque État FR</div></div>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <div class="risk-header"><span class="risk-title">Niveau de risque</span><span class="risk-val" style="color:var(--green)">Faible</span></div>
+        <div class="risk-track"><div class="risk-fill" style="width:22%;background:var(--green)"></div></div>
+        <div class="risk-ticks"><span class="risk-tick">Très faible</span><span class="risk-tick">Faible</span><span class="risk-tick">Modéré</span><span class="risk-tick">Élevé</span><span class="risk-tick">Très élevé</span></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-light)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+          <div class="stat-label">OAT France 10 ans</div>
+          <div class="stat-value">~3,2% / an</div>
+          <div class="stat-sub">Taux actuel (variable)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="stat-label">Revenu</div>
+          <div class="stat-value">Prévisible</div>
+          <div class="stat-sub">Coupon fixe annuel</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" stroke="var(--blue)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-label">Horizon</div>
+          <div class="stat-value">2 à 30 ans</div>
+          <div class="stat-sub">Selon la maturité choisie</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" stroke="var(--purple)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+          <div class="stat-label">Accès facile via</div>
+          <div class="stat-value">ETF obligataires</div>
+          <div class="stat-sub">Pas besoin d'acheter des OAT seul</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quand investir en obligations ?</div>
+        <div class="info-row" style="border-left:3px solid var(--amber)">
+          <svg viewBox="0 0 24 24" stroke="var(--amber)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div><strong style="color:var(--text)">La règle classique de l'âge</strong><br>Ton âge en pourcentage en obligations. À 20 ans → 20% obligations, 80% actions. À 60 ans → 60% obligations, 40% actions. Plus tu vieillis, plus tu réduites le risque pour protéger le capital accumulé.</div>
+        </div>
+        <p class="card-desc">Pour un investisseur de moins de 30 ans avec un horizon long, les obligations ne sont pas prioritaires. Leur rendement (~3%) est inférieur aux actions sur le long terme. Elles deviennent pertinentes quand on approche d'un objectif financier à court terme (achat immobilier dans 3 ans, par exemple) et qu'on veut sécuriser ses gains.</p>
+      </div>
+    </div>
+
+    <!-- ═══════ MATIERES ═══════ -->
+    <div class="panel" id="panel-matieres">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Actif réel · Couverture inflation</div>
+          <div class="hero-title">Matières premières :<br><em>l'ancre du monde physique</em></div>
+          <div class="hero-desc">Or, argent, pétrole, gaz naturel, blé, cuivre... Ces actifs ont une valeur intrinsèque dans l'économie réelle. Ils servent surtout de protection contre l'inflation et de diversificateur de portfolio.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--gold)">~8%</div><div class="meta-lbl">Or / an (20 ans)</div></div>
+          <div class="meta-card"><div class="meta-val" style="color:var(--green)">Faible</div><div class="meta-lbl">Corrélation actions</div></div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><circle cx="12" cy="12" r="5"/></svg></div>
+          <div class="stat-label">Or — 20 ans</div>
+          <div class="stat-value" style="color:var(--gold)">+540%</div>
+          <div class="stat-sub">Depuis 2004</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="stat-label">Anti-crise</div>
+          <div class="stat-value" style="color:var(--green)">Excellent</div>
+          <div class="stat-sub">+25% pendant Covid 2020</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-light)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div class="stat-label">Protection inflation</div>
+          <div class="stat-value">Excellente</div>
+          <div class="stat-sub">Actif réel = prix monte avec inflation</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--red-light)"><svg viewBox="0 0 24 24" stroke="var(--red)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-label">Dividendes</div>
+          <div class="stat-value" style="color:var(--red)">Zéro</div>
+          <div class="stat-sub">Actif non productif de revenus</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Comment investir dans l'or sans lingots</div>
+        <p class="card-desc">Pas besoin d'acheter des lingots physiques avec tous les problèmes de stockage et d'assurance que cela implique. Les ETF sur métaux précieux permettent d'accéder à ces marchés facilement :</p>
+        <div class="steps-grid" style="margin-top:16px">
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--gold-light);color:var(--gold);border-color:var(--gold)">1</div></div>
+            <div class="step-body">
+              <div class="step-title">iShares Physical Gold (IGLN)</div>
+              <div class="step-desc">Réplique fidèlement le cours de l'or spot. Chaque part correspond à une fraction d'or physique stocké dans des coffres. Frais : 0,12% / an. Non éligible PEA — utilise un Compte-Titres Ordinaire (CTO).</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--gold-light);color:var(--gold);border-color:var(--gold)">2</div></div>
+            <div class="step-body">
+              <div class="step-title">WisdomTree Physical Silver (PHAG)</div>
+              <div class="step-desc">Pour l'argent métal, plus volatil que l'or mais avec un meilleur potentiel de hausse en cas de boom industriel (panneaux solaires, semi-conducteurs). Frais : 0,19%.</div>
+            </div>
+          </div>
+        </div>
+        <div class="alert" style="background:var(--amber-light);border-color:rgba(247,162,95,0.3);color:var(--amber)">
+          <svg viewBox="0 0 24 24" stroke="var(--amber)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>L'or ne génère ni dividendes, ni intérêts, ni bénéfices. Sa valeur dépend uniquement de l'offre et de la demande. C'est une assurance, pas un moteur de croissance. Limite-le à 5-10% de ton portfolio.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ IMMOBILIER ═══════ -->
+    <div class="panel" id="panel-immo">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Immobilier papier · Revenus locatifs</div>
+          <div class="hero-title">SCPI :<br><em>l'immobilier sans les tracas</em></div>
+          <div class="hero-desc">Les SCPI (Sociétés Civiles de Placement Immobilier) te permettent d'investir dans l'immobilier professionnel (bureaux, commerces, entrepôts) dès quelques centaines d'euros, sans gérer de locataires ni de travaux.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--purple)">4–6%</div><div class="meta-lbl">Rendement / an</div></div>
+          <div class="meta-card"><div class="meta-val">500€</div><div class="meta-lbl">Minimum</div></div>
+        </div>
+      </div>
+
+      <div class="risk-section">
+        <div class="risk-header"><span class="risk-title">Niveau de risque</span><span class="risk-val" style="color:var(--purple)">Modéré</span></div>
+        <div class="risk-track"><div class="risk-fill" style="width:42%;background:linear-gradient(90deg,var(--green),var(--purple))"></div></div>
+        <div class="risk-ticks"><span class="risk-tick">Très faible</span><span class="risk-tick">Faible</span><span class="risk-tick">Modéré</span><span class="risk-tick">Élevé</span><span class="risk-tick">Très élevé</span></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" stroke="var(--purple)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <div class="stat-label">Type d'actif</div>
+          <div class="stat-value">Immobilier pro</div>
+          <div class="stat-sub">Bureaux, commerces, santé</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="stat-label">Rendement 2024</div>
+          <div class="stat-value" style="color:var(--gold)">4–6%</div>
+          <div class="stat-sub">Distribué trimestriellement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-light)"><svg viewBox="0 0 24 24" stroke="var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="stat-label">Horizon recommandé</div>
+          <div class="stat-value">8–10 ans</div>
+          <div class="stat-sub">Liquidité limitée à court terme</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="stat-label">Gestion</div>
+          <div class="stat-value">Totalement passive</div>
+          <div class="stat-sub">Zéro contact locataire</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Avantages et inconvénients des SCPI</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">✓ Avantages</div>
+            <div class="step-desc" style="margin-bottom:8px">• Revenus locatifs réguliers (trimestriels)</div>
+            <div class="step-desc" style="margin-bottom:8px">• Diversification immobilière immédiate</div>
+            <div class="step-desc" style="margin-bottom:8px">• Accessible dès 500€ (vs 200k€ pour un appartement)</div>
+            <div class="step-desc" style="margin-bottom:8px">• Zéro gestion, zéro travaux</div>
+            <div class="step-desc">• Achetable à crédit (levier)</div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">✗ Inconvénients</div>
+            <div class="step-desc" style="margin-bottom:8px">• Frais d'entrée élevés (8-12%)</div>
+            <div class="step-desc" style="margin-bottom:8px">• Liquidité faible (difficile à revendre vite)</div>
+            <div class="step-desc" style="margin-bottom:8px">• Fiscalité lourde (revenus fonciers)</div>
+            <div class="step-desc" style="margin-bottom:8px">• Valeur des parts peut baisser</div>
+            <div class="step-desc">• Sensibles aux taux d'intérêt</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ FISCALITE ═══════ -->
+    <div class="panel" id="panel-fiscalite">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Droit fiscal · France 2024</div>
+          <div class="hero-title">Fiscalité :<br><em>garder plus de ce que tu gagnes</em></div>
+          <div class="hero-desc">La fiscalité peut manger 30% de tes gains. Bien structurer tes enveloppes d'investissement peut diviser par deux ta facture fiscale. C'est probablement l'optimisation la plus rentable que tu puisses faire.</div>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-card"><div class="meta-val" style="color:var(--red)">30%</div><div class="meta-lbl">Flat tax CTO</div></div>
+          <div class="meta-card"><div class="meta-val" style="color:var(--green)">17,2%</div><div class="meta-lbl">PEA après 5 ans</div></div>
+        </div>
+      </div>
+
+      <div class="fiscalite-grid">
+        <div class="fiscalite-card">
+          <div class="fc-header">
+            <div class="fc-icon" style="background:var(--green-light)"><svg viewBox="0 0 24 24" stroke="var(--green)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="fc-title">PEA — Plan d'Épargne en Actions</div>
+          </div>
+          <div class="fc-rate" style="color:var(--green)">17,2%</div>
+          <div class="fc-detail">Uniquement les prélèvements sociaux — ZERO impôt sur le revenu après 5 ans de détention.</div>
+          <div class="fc-feature">Plafond versements : 150 000€</div>
+          <div class="fc-feature">Retrait avant 5 ans : clôture du PEA</div>
+          <div class="fc-feature">Accessible aux résidents fiscaux français dès 18 ans</div>
+          <div class="fc-feature">Uniquement actions européennes + ETF synthétiques</div>
+        </div>
+        <div class="fiscalite-card">
+          <div class="fc-header">
+            <div class="fc-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" stroke="var(--blue)"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <div class="fc-title">CTO — Compte-Titres Ordinaire</div>
+          </div>
+          <div class="fc-rate" style="color:var(--red)">30%</div>
+          <div class="fc-detail">Flat tax (Prélèvement Forfaitaire Unique) : 12,8% d'impôt + 17,2% de prélèvements sociaux.</div>
+          <div class="fc-feature">Pas de plafond de versement</div>
+          <div class="fc-feature">Accès à tous les marchés mondiaux</div>
+          <div class="fc-feature">Nécessaire pour les ETF non éligibles PEA (or, pays émergents hors synthétique)</div>
+        </div>
+        <div class="fiscalite-card">
+          <div class="fc-header">
+            <div class="fc-icon" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" stroke="var(--gold)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+            <div class="fc-title">Assurance-vie</div>
+          </div>
+          <div class="fc-rate" style="color:var(--gold)">7,5–30%</div>
+          <div class="fc-detail">Fiscalité dégressive : 30% avant 8 ans, 7,5% après 8 ans (sur les gains) avec abattement annuel de 4 600€.</div>
+          <div class="fc-feature">Avantage successoral majeur (152 500€ exonérés)</div>
+          <div class="fc-feature">Fonds euros + unités de compte</div>
+          <div class="fc-feature">Enveloppe complémentaire au PEA</div>
+        </div>
+        <div class="fiscalite-card">
+          <div class="fc-header">
+            <div class="fc-icon" style="background:var(--red-light)"><svg viewBox="0 0 24 24" stroke="var(--red)"><circle cx="12" cy="12" r="10"/><path d="M9.5 8h3.5a2 2 0 0 1 0 4H9.5V8z"/></svg></div>
+            <div class="fc-title">Crypto — Flat Tax</div>
+          </div>
+          <div class="fc-rate" style="color:var(--red)">30%</div>
+          <div class="fc-detail">Chaque cession de crypto est taxée à 30% sur la plus-value réalisée. Même crypto-vers-crypto compte comme cession.</div>
+          <div class="fc-feature">Déclaration obligatoire formulaire 2086</div>
+          <div class="fc-feature">Option IR possible si TMI < 11%</div>
+          <div class="fc-feature">Pertes reportables sur 10 ans (crypto uniquement)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">L'ordre d'ouverture optimal</div>
+        <div class="steps-grid" style="margin-top:16px">
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">1</div></div>
+            <div class="step-body">
+              <div class="step-title">Livret A + LDDS — épargne de précaution</div>
+              <div class="step-desc">3 à 6 mois de dépenses. Taux : 3% défiscalisé. C'est ton filet de sécurité. Ouvre-le en premier, remplis-le, puis passe à l'étape suivante.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--green-light);color:var(--green);border-color:var(--green)">2</div></div>
+            <div class="step-body">
+              <div class="step-title">PEA — maximise l'avantage fiscal</div>
+              <div class="step-desc">Ouvre-le dès que possible pour faire démarrer le compteur des 5 ans. Mets y des ETF monde. Augmente progressivement jusqu'au plafond de 150k€.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--gold-light);color:var(--gold);border-color:var(--gold)">3</div></div>
+            <div class="step-body">
+              <div class="step-title">Assurance-vie — diversification et succession</div>
+              <div class="step-desc">Complémentaire au PEA. Utile pour les actifs non éligibles PEA et pour la transmission de patrimoine. Ouvre-le tôt pour faire courir le délai de 8 ans.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num-wrap"><div class="step-num" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue)">4</div></div>
+            <div class="step-body">
+              <div class="step-title">CTO — pour les actifs sans alternative</div>
+              <div class="step-desc">Or, marchés émergents, actions américaines directes. Utilise-le uniquement pour ce que tu ne peux pas mettre en PEA ou assurance-vie. Fiscalité moins avantageuse.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ GLOSSAIRE ═══════ -->
+    <div class="panel" id="panel-glossaire">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Dictionnaire financier</div>
+          <div class="hero-title">Glossaire :<br><em>le vocabulaire des marchés</em></div>
+          <div class="hero-desc">60+ termes financiers expliqués simplement, sans jargon. De "action" à "yield", retrouve tous les concepts essentiels pour comprendre les marchés.</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-gloss-base')">Bases</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-gloss-avance')">Avancé</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-gloss-fiscalite')">Fiscalité</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-gloss-crypto')">Crypto</button>
+      </div>
+
+      <div class="tab-content active" id="tab-gloss-base">
+        <div class="glossary-grid">
+          <div class="glossary-item"><div class="glossary-term">📈 Action <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Bourse</span></div><div class="glossary-def">Fraction de propriété d'une entreprise. Si tu achètes 1 action Apple sur 15 milliards, tu possèdes 1/15 000 000 000 d'Apple.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🗂️ ETF <span class="glossary-category" style="background:var(--green-light);color:var(--green)">Fonds</span></div><div class="glossary-def">Exchange Traded Fund. Panier d'actions qui se négocie en bourse comme une action ordinaire. Combine la diversification d'un fonds et la liquidité d'une action.</div></div>
+          <div class="glossary-item"><div class="glossary-term">💰 Dividende <span class="glossary-category" style="background:var(--gold-light);color:var(--gold)">Revenus</span></div><div class="glossary-def">Part des bénéfices distribués aux actionnaires. Si tu possèdes 100 actions Total à 3€ de dividende, tu reçois 300€ par an sans rien vendre.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📊 Indice boursier <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Bourse</span></div><div class="glossary-def">Panier de références pour mesurer la performance d'un marché. Le CAC 40 regroupe les 40 plus grandes entreprises françaises. Le S&P 500 les 500 plus grandes américaines.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📉 Plus-value / Moins-value <span class="glossary-category" style="background:var(--amber-light);color:var(--amber)">Fiscalité</span></div><div class="glossary-def">Différence entre le prix de vente et le prix d'achat. Si tu achètes 100€ et vends 130€, tu as une plus-value de 30€. Elle est imposable en France à 30% (flat tax).</div></div>
+          <div class="glossary-item"><div class="glossary-term">🔄 DCA — Dollar Cost Averaging <span class="glossary-category" style="background:var(--green-light);color:var(--green)">Stratégie</span></div><div class="glossary-def">Investir une somme fixe à intervalles réguliers. Permet de lisser le prix d'achat sur les hauts et les bas du marché. Élimine le risque de "mal timer" son entrée.</div></div>
+          <div class="glossary-item"><div class="glossary-term">💱 Liquidité <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Marché</span></div><div class="glossary-def">Facilité à acheter ou vendre un actif rapidement sans impacter son prix. Les actions des grandes entreprises sont très liquides. L'immobilier physique est peu liquide (il faut des mois pour vendre).</div></div>
+          <div class="glossary-item"><div class="glossary-term">⚠️ Volatilité <span class="glossary-category" style="background:var(--red-light);color:var(--red)">Risque</span></div><div class="glossary-def">Amplitude des variations de prix d'un actif. Un actif très volatil peut monter de 20% ou chuter de 20% en quelques semaines. Bitcoin est très volatil. Les obligations sont peu volatiles.</div></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-gloss-avance">
+        <div class="glossary-grid">
+          <div class="glossary-item"><div class="glossary-term">📐 PER — Price to Earnings Ratio <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Analyse</span></div><div class="glossary-def">Ratio cours/bénéfice. Un PER de 20 signifie que tu paies 20€ pour chaque 1€ de bénéfice annuel. Permet de comparer la valorisation d'entreprises. PER élevé = actions chères.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🏦 Market Cap <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Évaluation</span></div><div class="glossary-def">Capitalisation boursière = cours × nombre d'actions. Représente la valeur totale de l'entreprise sur le marché. Apple : ~3 000 milliards $. C'est la mesure de taille standard.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🔁 Intérêts composés <span class="glossary-category" style="background:var(--green-light);color:var(--green)">Concept</span></div><div class="glossary-def">Les intérêts génèrent eux-mêmes des intérêts. 1 000€ à 8% par an = 1 080€ après 1 an, 1 166€ après 2 ans... et 10 063€ après 30 ans. Einstein l'appelait "la huitième merveille du monde".</div></div>
+          <div class="glossary-item"><div class="glossary-term">📊 Alpha / Bêta <span class="glossary-category" style="background:var(--purple-light);color:var(--purple)">Analyse</span></div><div class="glossary-def">Alpha = sur/sous-performance par rapport au marché. Bêta = sensibilité aux mouvements du marché. Un bêta de 1,5 signifie que si le marché chute de 10%, l'actif chute de 15%.</div></div>
+          <div class="glossary-item"><div class="glossary-term">💹 Corrélation <span class="glossary-category" style="background:var(--gold-light);color:var(--gold)">Portfolio</span></div><div class="glossary-def">Mesure comment deux actifs évoluent l'un par rapport à l'autre. Une corrélation de -1 signifie qu'ils vont en sens opposé (parfait pour diversifier). L'or a une faible corrélation avec les actions.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🛡️ Sharpe Ratio <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Performance</span></div><div class="glossary-def">Mesure la performance ajustée du risque. Un ratio de Sharpe élevé signifie que tu obtiens un bon rendement pour le niveau de risque pris. C'est la vraie mesure de l'efficacité d'un investissement.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📉 Drawdown <span class="glossary-category" style="background:var(--red-light);color:var(--red)">Risque</span></div><div class="glossary-def">Perte maximale depuis un point haut. Le "max drawdown" du S&P 500 en 2008-2009 était de -57%. Savoir à l'avance le drawdown possible d'un actif aide à ne pas paniquer et vendre au pire moment.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🔬 Analyse fondamentale <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Méthode</span></div><div class="glossary-def">Évaluation de la valeur réelle d'une entreprise via ses bilan, compte de résultat, flux de trésorerie, avantages concurrentiels. Méthode de Warren Buffett. Cherche à acheter des entreprises de qualité sous-évaluées.</div></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-gloss-fiscalite">
+        <div class="glossary-grid">
+          <div class="glossary-item"><div class="glossary-term">🛡️ PEA <span class="glossary-category" style="background:var(--green-light);color:var(--green)">Enveloppe</span></div><div class="glossary-def">Plan d'Épargne en Actions. Exonération d'impôt sur le revenu après 5 ans. Plafond : 150 000€. Réservé aux résidents fiscaux français, une seule par personne.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📋 Flat Tax / PFU <span class="glossary-category" style="background:var(--red-light);color:var(--red)">Impôt</span></div><div class="glossary-def">Prélèvement Forfaitaire Unique de 30% sur les revenus du capital (12,8% impôt + 17,2% prélèvements sociaux). S'applique aux plus-values et dividendes sur CTO.</div></div>
+          <div class="glossary-item"><div class="glossary-term">💼 Assurance-vie <span class="glossary-category" style="background:var(--gold-light);color:var(--gold)">Enveloppe</span></div><div class="glossary-def">Enveloppe avec une fiscalité dégressive. Après 8 ans, les retraits sont très peu taxés avec un abattement annuel de 4 600€ (9 200€ en couple). Aussi très avantageux en cas de succession.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📑 Formulaire 2086 <span class="glossary-category" style="background:var(--amber-light);color:var(--amber)">Crypto</span></div><div class="glossary-def">Formulaire fiscal obligatoire pour déclarer les plus-values sur cryptomonnaies en France. À remplir chaque année si tu as effectué des cessions de crypto-actifs, même minimes.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🔢 Abattement <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Fiscalité</span></div><div class="glossary-def">Réduction de la base imposable. Sur l'assurance-vie après 8 ans : abattement annuel de 4 600€ sur les gains (9 200€ pour un couple marié). En dessous de ce seuil, aucun impôt à payer.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🏦 LDDS <span class="glossary-category" style="background:var(--green-light);color:var(--green)">Livret</span></div><div class="glossary-def">Livret de Développement Durable et Solidaire. Défiscalisé comme le Livret A. Taux identique (3%). Plafond : 12 000€. Complémentaire au Livret A pour l'épargne de précaution.</div></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-gloss-crypto">
+        <div class="glossary-grid">
+          <div class="glossary-item"><div class="glossary-term">⛓️ Blockchain <span class="glossary-category" style="background:var(--purple-light);color:var(--purple)">Technologie</span></div><div class="glossary-def">Base de données décentralisée et immuable partagée entre des milliers d'ordinateurs. Chaque transaction est enregistrée dans un "bloc" lié au précédent. Impossible à modifier rétroactivement.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📜 Smart Contract <span class="glossary-category" style="background:var(--purple-light);color:var(--purple)">Ethereum</span></div><div class="glossary-def">Programme informatique qui s'exécute automatiquement sur la blockchain selon des conditions prédéfinies. "Si X arrive, fais Y". Pas besoin d'intermédiaire (banque, notaire). Base de la DeFi.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🏦 DeFi <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Secteur</span></div><div class="glossary-def">Finance Décentralisée. Services financiers (prêts, emprunts, échanges) sans intermédiaire traditionnel. Risqué — les smart contracts peuvent contenir des bugs, menant à des pertes totales.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🔑 Seed Phrase / Phrase mnémotechnique <span class="glossary-category" style="background:var(--red-light);color:var(--red)">Sécurité</span></div><div class="glossary-def">Suite de 12 ou 24 mots qui donne accès à ton wallet crypto. Si quelqu'un la connaît, il peut voler tous tes fonds. Ne la stocke jamais numériquement. Note-la sur papier, à plusieurs endroits.</div></div>
+          <div class="glossary-item"><div class="glossary-term">🪙 Altcoin <span class="glossary-category" style="background:var(--red-light);color:var(--red)">Risque élevé</span></div><div class="glossary-def">Toute cryptomonnaie autre que Bitcoin. Risque beaucoup plus élevé, liquidité souvent faible, susceptibles aux rug pulls. 99% des altcoins créés depuis 2017 ont perdu 99%+ de leur valeur.</div></div>
+          <div class="glossary-item"><div class="glossary-term">📊 Market Cap Crypto <span class="glossary-category" style="background:var(--blue-light);color:var(--blue)">Évaluation</span></div><div class="glossary-def">Cours × nombre de tokens en circulation. Attention : peut être trompeur car beaucoup de tokens ont une liquidité réelle bien inférieure à leur market cap affiché.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ QUIZ ═══════ -->
+    <div class="panel" id="panel-quiz">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Quiz interactif · 10 questions</div>
+          <div class="hero-title">Teste tes<br><em>connaissances financières</em></div>
+          <div class="hero-desc">10 questions pour évaluer ta maîtrise des marchés financiers. De la fiscalité aux stratégies d'investissement. Prend 5 minutes.</div>
+        </div>
+      </div>
+
+      <div class="quiz-card" id="quizContainer">
+        <div class="quiz-progress">
+          <div class="qp-label"><span id="qLabel">Question 1 / 10</span><span id="qScore">Score : 0</span></div>
+          <div class="qp-track"><div class="qp-fill" id="qProgress" style="width:10%"></div></div>
+        </div>
+        <div class="quiz-q" id="quizQ">Quel est l'avantage principal du PEA par rapport à un Compte-Titres Ordinaire ?</div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-explanation" id="quizExplanation"></div>
+        <div class="quiz-nav">
+          <div class="quiz-score">Score actuel : <strong id="qScoreDisplay">0 / 0</strong></div>
+          <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none">Question suivante →</button>
+        </div>
+      </div>
+
+      <div id="quizResult" style="display:none" class="quiz-card">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:16px" id="resultEmoji">🎯</div>
+          <div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;margin-bottom:8px" id="resultTitle">Excellent travail !</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:24px" id="resultDesc">Tu as une bonne maîtrise des concepts financiers.</div>
+          <div style="font-size:36px;font-weight:700;color:var(--gold);margin-bottom:4px" id="resultScore"></div>
+          <div style="font-size:13px;color:var(--muted)">réponses correctes</div>
+          <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top:24px">Recommencer le quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ SIMULATEUR ═══════ -->
+    <div class="panel" id="panel-simulateur">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Outil · Simulation mathématique</div>
+          <div class="hero-title">Simulateur :<br><em>vois ton futur financier</em></div>
+          <div class="hero-desc">Combien auras-tu dans 10, 20, 30 ans ? Ajuste les paramètres et découvre la puissance des intérêts composés. Ces chiffres ne sont pas de la magie — c'est des mathématiques.</div>
+        </div>
+      </div>
+
+      <div class="scenario-tabs">
+        <button class="scenario-btn active" onclick="setScenario(this, 50, 7, 19)">Débutant prudent</button>
+        <button class="scenario-btn" onclick="setScenario(this, 150, 8, 25)">Salarié régulier</button>
+        <button class="scenario-btn" onclick="setScenario(this, 300, 9, 30)">Cadre ambitieux</button>
+        <button class="scenario-btn" onclick="setScenario(this, 500, 10, 35)">Investisseur confirmé</button>
+      </div>
+
+      <div class="sim-layout">
+        <div class="sim-controls">
+          <div class="card">
+            <div class="slider-group">
+              <div class="slider-header">
+                <div>
+                  <div class="slider-label">Versement mensuel</div>
+                  <div class="slider-sub">Ce que tu investis chaque mois</div>
+                </div>
+                <div class="slider-value" id="outMontant">50 €</div>
+              </div>
+              <input type="range" id="simMontant" min="10" max="2000" value="50" step="10" oninput="updateSim()">
+              <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--hint)"><span>10 €</span><span>2 000 €</span></div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <div>
+                  <div class="slider-label">Rendement annuel estimé</div>
+                  <div class="slider-sub">MSCI World historique : ~8%</div>
+                </div>
+                <div class="slider-value" id="outTaux">7 %</div>
+              </div>
+              <input type="range" id="simTaux" min="1" max="15" value="7" step="0.5" oninput="updateSim()">
+              <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--hint)"><span>1%</span><span>15%</span></div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <div>
+                  <div class="slider-label">Âge de départ</div>
+                  <div class="slider-sub">Plus tôt = bien plus d'argent</div>
+                </div>
+                <div class="slider-value" id="outAge">19 ans</div>
+              </div>
+              <input type="range" id="simAge" min="18" max="55" value="19" step="1" oninput="updateSim()">
+              <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--hint)"><span>18 ans</span><span>55 ans</span></div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <div>
+                  <div class="slider-label">Capital de départ</div>
+                  <div class="slider-sub">Montant investi immédiatement</div>
+                </div>
+                <div class="slider-value" id="outCapital">0 €</div>
+              </div>
+              <input type="range" id="simCapital" min="0" max="50000" value="0" step="500" oninput="updateSim()">
+              <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--hint)"><span>0 €</span><span>50 000 €</span></div>
+            </div>
+
+            <div class="chart-box">
+              <canvas id="simChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-results-panel">
+          <div class="result-stack" id="resultStack"></div>
+
+          <div class="card" style="margin-top:16px">
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Coût d'attente</div>
+            <p style="font-size:13px;color:var(--muted);line-height:1.6">Chaque année où tu n'investis pas te coûte environ <strong style="color:var(--text)" id="costWait">—</strong> de gains perdus sur 20 ans. Le temps est ton actif le plus précieux.</p>
+          </div>
+
+          <div class="card" style="margin-top:0">
+            <div style="font-size:11px;color:var(--hint);line-height:1.6">Simulation mathématique à titre éducatif uniquement. Les rendements supposent un taux constant — en réalité, les marchés fluctuent fortement d'une année à l'autre. Les performances passées ne garantissent pas les performances futures. Ce n'est pas un conseil en investissement.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-sep"><div class="section-sep-line"></div><div class="section-sep-label">Où ouvrir ton compte</div><div class="section-sep-line"></div></div>
+
+      <div class="broker-grid">
+        <div class="broker-card featured">
+          <div class="broker-logo" style="background:var(--gold-light);color:var(--gold)">TR</div>
+          <div class="broker-name">Trade Republic</div>
+          <div class="broker-type">Néo-courtier · Allemagne</div>
+          <ul class="broker-features">
+            <li>0€ de frais par ordre</li>
+            <li>PEA disponible</li>
+            <li>Fractional shares dès 1€</li>
+            <li>Plans d'épargne automatiques</li>
+            <li>Intérêts sur cash non investi</li>
+          </ul>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="broker-score"><span class="broker-star">★★★★★</span><span class="broker-score-val"> 4.8</span></div>
+            <span class="broker-tag" style="background:var(--gold-light);color:var(--gold)">Recommandé</span>
+          </div>
+        </div>
+        <div class="broker-card">
+          <div class="broker-logo" style="background:var(--blue-light);color:var(--blue)">BM</div>
+          <div class="broker-name">Boursorama</div>
+          <div class="broker-type">Banque en ligne · France</div>
+          <ul class="broker-features">
+            <li>PEA sans frais de garde</li>
+            <li>Banque + bourse intégrée</li>
+            <li>Application mobile soignée</li>
+            <li>Offre de bienvenue régulière</li>
+            <li>LDDS et Livret A disponibles</li>
+          </ul>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="broker-score"><span class="broker-star">★★★★</span><span style="color:var(--hint)">★</span><span class="broker-score-val"> 4.3</span></div>
+            <span class="broker-tag" style="background:var(--blue-light);color:var(--blue)">Banque complète</span>
+          </div>
+        </div>
+        <div class="broker-card">
+          <div class="broker-logo" style="background:var(--green-light);color:var(--green)">FN</div>
+          <div class="broker-name">Fortuneo</div>
+          <div class="broker-type">Banque en ligne · France</div>
+          <ul class="broker-features">
+            <li>Frais compétitifs</li>
+            <li>Interface trader avancée</li>
+            <li>PEA + CTO + assurance-vie</li>
+            <li>Bons outils d'analyse</li>
+            <li>SAV réactif</li>
+          </ul>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="broker-score"><span class="broker-star">★★★★</span><span style="color:var(--hint)">★</span><span class="broker-score-val"> 4.2</span></div>
+            <span class="broker-tag" style="background:var(--green-light);color:var(--green)">Profil actif</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PORTFOLIO BUILDER ═══════ -->
+    <div class="panel" id="panel-portfolio">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Outil · Construction de portfolio</div>
+          <div class="hero-title">Construis ton<br><em>portfolio idéal</em></div>
+          <div class="hero-desc">Ajuste la répartition de tes actifs et visualise instantanément la performance, le risque et les caractéristiques de ton portfolio. Les chiffres sont basés sur les données historiques.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:24px">
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:20px">Allocation d'actifs</div>
+
+          <div class="alloc-row">
+            <div class="alloc-color" style="background:var(--blue)"></div>
+            <span class="alloc-label">ETF Monde</span>
+            <input type="range" class="alloc-range" id="a-etf" min="0" max="100" value="70" oninput="updatePortfolio()">
+            <span class="alloc-pct" id="p-etf">70%</span>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-color" style="background:var(--blue)" style="background:#4F8EF7aa"></div>
+            <span class="alloc-label" style="font-size:12px">Actions FR</span>
+            <input type="range" class="alloc-range" id="a-fr" min="0" max="100" value="10" oninput="updatePortfolio()">
+            <span class="alloc-pct" id="p-fr">10%</span>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-color" style="background:var(--gold)"></div>
+            <span class="alloc-label">Or (ETF)</span>
+            <input type="range" class="alloc-range" id="a-gold" min="0" max="100" value="5" oninput="updatePortfolio()">
+            <span class="alloc-pct" id="p-gold">5%</span>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-color" style="background:var(--amber)"></div>
+            <span class="alloc-label">Obligations</span>
+            <input type="range" class="alloc-range" id="a-oblig" min="0" max="100" value="10" oninput="updatePortfolio()">
+            <span class="alloc-pct" id="p-oblig">10%</span>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-color" style="background:var(--red)"></div>
+            <span class="alloc-label">Crypto</span>
+            <input type="range" class="alloc-range" id="a-crypto" min="0" max="100" value="5" oninput="updatePortfolio()">
+            <span class="alloc-pct" id="p-crypto">5%</span>
+          </div>
+
+          <div style="margin-top:16px;padding:12px 16px;border-radius:8px;display:flex;align-items:center;justify-content:space-between" id="allocTotal">
+            <span style="font-size:13px;color:var(--muted)">Total alloué</span>
+            <span class="alloc-total ok" id="allocTotalVal">100%</span>
+          </div>
+
+          <div class="portfolio-summary" style="margin-top:16px">
+            <div class="ps-card"><div class="ps-val" id="ps-rendement" style="color:var(--green)">—</div><div class="ps-lbl">Rendement estimé</div></div>
+            <div class="ps-card"><div class="ps-val" id="ps-risque">—</div><div class="ps-lbl">Niveau de risque</div></div>
+            <div class="ps-card"><div class="ps-val" id="ps-profil">—</div><div class="ps-lbl">Profil</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Répartition</div>
+            <div class="donut-wrap">
+              <canvas id="donutChart" width="160" height="160"></canvas>
+            </div>
+            <div id="donutLegend" style="font-size:12px;color:var(--muted);text-align:left"></div>
+          </div>
+          <div class="alert" style="margin-top:12px;background:var(--gold-light);border-color:rgba(201,168,76,0.3);color:var(--gold)">
+            <svg viewBox="0 0 24 24" stroke="var(--gold)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>Le total doit égaler 100% pour calculer les métriques de ton portfolio.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ COMPARATEUR ═══════ -->
+    <div class="panel" id="panel-comparateur">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Outil · Analyse comparative</div>
+          <div class="hero-title">Comparateur :<br><em>tous les actifs en un coup d'œil</em></div>
+          <div class="hero-desc">Rendement, risque, horizon, fiscalité, accessibilité... Compare tous les actifs disponibles aux particuliers français.</div>
+        </div>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Actif</th>
+              <th style="text-align:center">Risque</th>
+              <th style="text-align:center">Rendement moy.</th>
+              <th style="text-align:center">Horizon idéal</th>
+              <th style="text-align:center">Fiscalité</th>
+              <th style="text-align:center">Note débutant</th>
+              <th style="text-align:center">Recommandation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--green-light)">🗂️</div>ETF MSCI World</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--amber-light);color:var(--amber)">Modéré</span></td>
+              <td style="text-align:center;font-weight:600;color:var(--green)">~8% / an</td>
+              <td style="text-align:center;color:var(--muted)">10–30 ans</td>
+              <td style="text-align:center;color:var(--green);font-size:12px;font-weight:600">17,2% (PEA)</td>
+              <td style="text-align:center"><span class="ct-stars">★★★★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--green-light);color:var(--green)">Priorité 1</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--blue-light)">📈</div>Actions individuelles</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--red-light);color:var(--red)">Élevé</span></td>
+              <td style="text-align:center;font-weight:600">Variable</td>
+              <td style="text-align:center;color:var(--muted)">5–20 ans</td>
+              <td style="text-align:center;color:var(--green);font-size:12px;font-weight:600">17,2% (PEA)</td>
+              <td style="text-align:center"><span class="ct-stars">★★★</span><span style="color:var(--hint)">★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--blue-light);color:var(--blue)">Avec exp.</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--red-light)">₿</div>Bitcoin / Ethereum</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--red-light);color:var(--red)">Très élevé</span></td>
+              <td style="text-align:center;font-weight:600">Très variable</td>
+              <td style="text-align:center;color:var(--muted)">3–10 ans</td>
+              <td style="text-align:center;color:var(--red);font-size:12px;font-weight:600">30% (CTO)</td>
+              <td style="text-align:center"><span class="ct-stars">★★</span><span style="color:var(--hint)">★★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--amber-light);color:var(--amber)">Max 5-10%</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--amber-light)">🏛️</div>Obligations État</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--green-light);color:var(--green)">Faible</span></td>
+              <td style="text-align:center;font-weight:600">~3% / an</td>
+              <td style="text-align:center;color:var(--muted)">2–15 ans</td>
+              <td style="text-align:center;color:var(--red);font-size:12px;font-weight:600">30% (CTO)</td>
+              <td style="text-align:center"><span class="ct-stars">★★★</span><span style="color:var(--hint)">★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--hint);color:var(--bg)">30 ans+</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--gold-light)">🥇</div>Or (ETF)</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--amber-light);color:var(--amber)">Modéré</span></td>
+              <td style="text-align:center;font-weight:600">~8% / an</td>
+              <td style="text-align:center;color:var(--muted)">5–20 ans</td>
+              <td style="text-align:center;color:var(--red);font-size:12px;font-weight:600">30% (CTO)</td>
+              <td style="text-align:center"><span class="ct-stars">★★★★</span><span style="color:var(--hint)">★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--gold-light);color:var(--gold)">5-10% max</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--purple-light)">🏢</div>SCPI</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--amber-light);color:var(--amber)">Modéré</span></td>
+              <td style="text-align:center;font-weight:600">4–6% / an</td>
+              <td style="text-align:center;color:var(--muted)">8–15 ans</td>
+              <td style="text-align:center;color:var(--red);font-size:12px;font-weight:600">Rev. fonciers</td>
+              <td style="text-align:center"><span class="ct-stars">★★★</span><span style="color:var(--hint)">★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--purple-light);color:var(--purple)">Diversif.</span></td>
+            </tr>
+            <tr>
+              <td><div class="ct-name"><div class="ct-icon" style="background:var(--green-light)">📗</div>Livret A</div></td>
+              <td style="text-align:center"><span class="ct-badge" style="background:var(--green-light);color:var(--green)">Nul</span></td>
+              <td style="text-align:center;font-weight:600">3% / an</td>
+              <td style="text-align:center;color:var(--muted)">Court terme</td>
+              <td style="text-align:center;color:var(--green);font-size:12px;font-weight:600">Exonéré</td>
+              <td style="text-align:center"><span class="ct-stars">★★★★★</span></td>
+              <td style="text-align:center"><span class="ct-rec" style="background:var(--green-light);color:var(--green)">Précaution</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Le portfolio idéal par tranche d'âge</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">
+          <div style="background:var(--surface2);border-radius:var(--rs);padding:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">🧑 18–30 ans</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">80-90% ETF monde (PEA)</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">5-10% Or (CTO)</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">0-5% Crypto</div>
+            <div style="font-size:12px;color:var(--muted)">0-5% Obligations</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:var(--rs);padding:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">👨 30–50 ans</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">60-70% ETF monde</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">10-15% Actions FR</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">10% SCPI</div>
+            <div style="font-size:12px;color:var(--muted)">5-10% Or / Obligations</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:var(--rs);padding:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">👴 50 ans+</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">40-50% Obligations / Fonds €</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">30-40% Actions / ETF</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:4px">10-15% SCPI</div>
+            <div style="font-size:12px;color:var(--muted)">5-10% Or</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ ACTUALITES ═══════ -->
+    <div class="panel" id="panel-actualites">
+      <div class="hero">
+        <div>
+          <div class="hero-badge">Actualités · Marché & Économie</div>
+          <div class="hero-title">Ce que tu dois<br><em>suivre (et ignorer)</em></div>
+          <div class="hero-desc">L'information financière est conçue pour te faire réagir et bouger ton argent. Voici les contenus éducatifs et les sources à suivre — sans le bruit des médias financiers.</div>
+        </div>
+      </div>
+
+      <div class="alert" style="background:var(--gold-light);border-color:rgba(201,168,76,0.25);color:var(--gold);margin-bottom:20px">
+        <svg viewBox="0 0 24 24" stroke="var(--gold)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>Rappel : les actualités financières à court terme sont du bruit. L'investisseur passif ignore les nouvelles quotidiennes. Ce qui compte : ta stratégie sur 10-20 ans, pas ce qui se passe cette semaine.</div>
+      </div>
+
+      <div class="news-grid">
+        <div class="news-card">
+          <div>
+            <span class="news-tag" style="background:var(--blue-light);color:var(--blue)">Éducatif</span>
+            <div class="news-title">Comment lire un bilan comptable en 10 minutes</div>
+            <div class="news-desc">Actif, passif, capitaux propres, dettes... comprendre ces 4 notions te permet d'analyser n'importe quelle entreprise cotée en bourse.</div>
+            <div class="news-meta"><span>Niveau intermédiaire</span><span>15 min de lecture</span></div>
+          </div>
+          <div class="news-img" style="background:var(--blue-light)">📊</div>
+        </div>
+
+        <div class="news-card">
+          <div>
+            <span class="news-tag" style="background:var(--green-light);color:var(--green)">Stratégie</span>
+            <div class="news-title">Inflation et investissements : comment protéger ton capital</div>
+            <div class="news-desc">À 3% d'inflation par an, 10 000€ ne valent plus que 7 400€ en pouvoir d'achat dans 10 ans. Voici les actifs qui protègent contre l'inflation.</div>
+            <div class="news-meta"><span>Niveau débutant</span><span>8 min de lecture</span></div>
+          </div>
+          <div class="news-img" style="background:var(--green-light)">🛡️</div>
+        </div>
+
+        <div class="news-card">
+          <div>
+            <span class="news-tag" style="background:var(--gold-light);color:var(--gold)">Psychologie</span>
+            <div class="news-title">Les 7 biais cognitifs qui détruisent les portefeuilles</div>
+            <div class="news-desc">FOMO, biais de confirmation, aversion aux pertes, excès de confiance... La psychologie est le plus grand ennemi de l'investisseur. Apprends à te défendre contre toi-même.</div>
+            <div class="news-meta"><span>Niveau intermédiaire</span><span>12 min de lecture</span></div>
+          </div>
+          <div class="news-img" style="background:var(--gold-light)">🧠</div>
+        </div>
+
+        <div class="news-card">
+          <div>
+            <span class="news-tag" style="background:var(--purple-light);color:var(--purple)">Fiscal</span>
+            <div class="news-title">PEA, CTO, assurance-vie : quoi mettre où ?</div>
+            <div class="news-desc">Optimiser ses enveloppes fiscales peut te faire économiser des milliers d'euros sur 20 ans. La règle est simple une fois qu'on la comprend.</div>
+            <div class="news-meta"><span>Niveau débutant</span><span>10 min de lecture</span></div>
+          </div>
+          <div class="news-img" style="background:var(--purple-light)">🏦</div>
+        </div>
+      </div>
+
+      <div class="section-sep"><div class="section-sep-line"></div><div class="section-sep-label">Sources fiables recommandées</div><div class="section-sep-line"></div></div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <div class="card" style="cursor:pointer">
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px">📚 Le site de l'AMF</div>
+          <div style="font-size:12px;color:var(--muted)">Autorité des Marchés Financiers. Infos officielles, alertes arnaques, liste des plateformes agréées. Incontournable.</div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px">🎓 Investopedia</div>
+          <div style="font-size:12px;color:var(--muted)">La référence mondiale pour apprendre la finance. En anglais, mais toujours précis et sourcé. Excellent pour le glossaire.</div>
+        </div>
+        <div class="card" style="cursor:pointer">
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px">📊 MSCI.com</div>
+          <div style="font-size:12px;color:var(--muted)">Les données officielles des indices MSCI World, Emerging Markets, etc. Rendements historiques vérifiables.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ─── NAV ───
+const panels = {
+  actions: { title: 'Actions & Bourse', sub: 'Devenir actionnaire d\'une entreprise cotée', badge: 'Risque moyen-élevé', badgeBg: 'var(--blue-light)', badgeColor: 'var(--blue)', badgeBorder: 'rgba(79,142,247,0.2)', dot: 'var(--blue)' },
+  etf: { title: 'ETF — Fonds indiciels', sub: 'La méthode des investisseurs passifs', badge: 'Risque modéré', badgeBg: 'var(--green-light)', badgeColor: 'var(--green)', badgeBorder: 'rgba(61,214,140,0.2)', dot: 'var(--green)' },
+  crypto: { title: 'Cryptomonnaies', sub: 'Bitcoin, Ethereum et les altcoins', badge: 'Risque très élevé', badgeBg: 'var(--red-light)', badgeColor: 'var(--red)', badgeBorder: 'rgba(247,95,95,0.2)', dot: 'var(--red)' },
+  obligations: { title: 'Obligations', sub: 'Prêter à des États et entreprises', badge: 'Risque faible', badgeBg: 'var(--amber-light)', badgeColor: 'var(--amber)', badgeBorder: 'rgba(247,162,95,0.2)', dot: 'var(--amber)' },
+  matieres: { title: 'Matières premières', sub: 'Or, argent, pétrole...', badge: 'Risque modéré', badgeBg: 'var(--gold-light)', badgeColor: 'var(--gold)', badgeBorder: 'rgba(201,168,76,0.2)', dot: 'var(--gold)' },
+  immo: { title: 'Immobilier — SCPI', sub: 'L\'immobilier accessible à tous', badge: 'Risque modéré', badgeBg: 'var(--purple-light)', badgeColor: 'var(--purple)', badgeBorder: 'rgba(155,127,234,0.2)', dot: 'var(--purple)' },
+  fiscalite: { title: 'Fiscalité & Impôts', sub: 'PEA, CTO, assurance-vie — optimise tes impôts', badge: 'Guide pratique', badgeBg: 'var(--amber-light)', badgeColor: 'var(--amber)', badgeBorder: 'rgba(247,162,95,0.2)', dot: 'var(--amber)' },
+  glossaire: { title: 'Glossaire financier', sub: '60+ termes expliqués simplement', badge: 'Dictionnaire', badgeBg: 'var(--gold-light)', badgeColor: 'var(--gold)', badgeBorder: 'rgba(201,168,76,0.2)', dot: 'var(--gold)' },
+  quiz: { title: 'Quiz financier', sub: 'Teste tes connaissances en 10 questions', badge: 'Éducatif', badgeBg: 'var(--blue-light)', badgeColor: 'var(--blue)', badgeBorder: 'rgba(79,142,247,0.2)', dot: 'var(--blue)' },
+  simulateur: { title: 'Simulateur d\'épargne', sub: 'Projette tes investissements dans le temps', badge: 'Outil éducatif', badgeBg: 'var(--purple-light)', badgeColor: 'var(--purple)', badgeBorder: 'rgba(155,127,234,0.2)', dot: 'var(--purple)' },
+  portfolio: { title: 'Constructeur de portfolio', sub: 'Construis et analyse ton allocation', badge: 'Outil interactif', badgeBg: 'var(--green-light)', badgeColor: 'var(--green)', badgeBorder: 'rgba(61,214,140,0.2)', dot: 'var(--green)' },
+  comparateur: { title: 'Comparateur d\'actifs', sub: 'Tous les actifs côte à côte', badge: 'Outil', badgeBg: 'rgba(80,200,180,0.12)', badgeColor: '#3DD6B5', badgeBorder: 'rgba(80,200,180,0.2)', dot: '#3DD6B5' },
+  actualites: { title: 'Actualités & Ressources', sub: 'Ce que tu dois suivre — et ignorer', badge: 'Curated', badgeBg: 'var(--red-light)', badgeColor: 'var(--red)', badgeBorder: 'rgba(247,95,95,0.2)', dot: 'var(--red)' }
+};
+
+let visitedPanels = new Set(['actions']);
+
+function navigate(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (!panel) return;
+  panel.classList.add('active');
+  const navBtn = document.getElementById('nav-' + id);
+  if (navBtn) navBtn.classList.add('active');
+
+  const info = panels[id];
+  if (info) {
+    document.getElementById('topbarTitle').textContent = info.title;
+    document.getElementById('topbarSub').textContent = info.sub;
+    const badge = document.getElementById('topbarBadge');
+    badge.style.background = info.badgeBg;
+    badge.style.color = info.badgeColor;
+    badge.style.borderColor = info.badgeBorder;
+    badge.innerHTML = `<span class="risk-dot" style="background:${info.dot}"></span>${info.badge}`;
+  }
+
+  visitedPanels.add(id);
+  const pct = Math.round((visitedPanels.size / Object.keys(panels).length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  if (id === 'simulateur') { setTimeout(updateSim, 100); }
+  if (id === 'portfolio') { setTimeout(initPortfolio, 100); }
+  if (id === 'quiz') { initQuiz(); }
+}
+
+// ─── TABS ───
+function switchTab(btn, contentId) {
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = btn.closest('.panel');
+  panel.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(contentId).classList.add('active');
+}
+
+// ─── SEARCH ───
+function openSearch() { document.getElementById('searchModal').classList.add('open'); setTimeout(() => document.getElementById('searchInput').focus(), 50); }
+function closeSearch() { document.getElementById('searchModal').classList.remove('open'); document.getElementById('searchInput').value = ''; filterSearch(''); }
+document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); } if (e.key === 'Escape') closeSearch(); });
+function filterSearch(val) {
+  const items = document.querySelectorAll('.modal-result');
+  items.forEach(item => { item.style.display = val === '' || item.textContent.toLowerCase().includes(val.toLowerCase()) ? '' : 'none'; });
+}
+
+// ─── QUIZ ───
+const quizData = [
+  { q: "Quel est l'avantage fiscal principal du PEA après 5 ans ?", opts: ["Exonération totale d'impôts", "Taux réduit de 17,2% (prélèvements sociaux uniquement)", "Taux réduit de 7,5%", "Aucun avantage fiscal"], correct: 1, exp: "Après 5 ans de détention, les gains du PEA sont exonérés d'impôt sur le revenu. Seuls les prélèvements sociaux de 17,2% s'appliquent (contre 30% en CTO)." },
+  { q: "Qu'est-ce que le DCA (Dollar Cost Averaging) ?", opts: ["Acheter des dollars américains régulièrement", "Investir une somme fixe à intervalles réguliers, quel que soit le cours", "Vendre quand les marchés montent et acheter quand ils baissent", "Diversifier uniquement dans des actifs américains"], correct: 1, exp: "Le DCA consiste à investir une somme fixe (ex: 100€/mois) régulièrement, indépendamment des conditions de marché. Cela lisse le prix d'achat et élimine le stress du 'bon moment pour investir'." },
+  { q: "Pourquoi un ETF MSCI World est-il préférable à une seule action pour un débutant ?", opts: ["Il garantit un rendement positif chaque année", "Il réplique automatiquement 1500 entreprises — diversification maximale", "Il est exempt d'impôts en France", "Il peut uniquement être acheté en PEA"], correct: 1, exp: "Un ETF MSCI World contient automatiquement les 1500+ plus grandes entreprises mondiales dans 23 pays. Si une entreprise fait faillite, l'impact sur ton investissement est infime." },
+  { q: "Qu'est-ce qu'un dividende ?", opts: ["Le prix d'achat d'une action", "Une taxe prélevée lors de la vente d'actions", "La part des bénéfices distribués aux actionnaires", "Le coupon d'une obligation"], correct: 2, exp: "Un dividende est la part des bénéfices qu'une entreprise distribue à ses actionnaires. Si tu possèdes 100 actions d'une entreprise qui verse 2€ de dividende par action, tu reçois 200€ par an." },
+  { q: "Quelle règle s'applique pour les investissements en cryptomonnaies ?", opts: ["Investis tout ton capital pour maximiser les gains", "Maximum 50% de ton portfolio", "N'investis que ce que tu acceptes de perdre entièrement", "Investi uniquement dans Bitcoin"], correct: 2, exp: "La règle universelle : n'investis en crypto que la somme dont tu acceptes la perte totale. La volatilité peut être extrême (Bitcoin a déjà chuté de -80%). Limite recommandée : 5-10% du portfolio total." },
+  { q: "Quelle est la différence entre un ETF 'Acc' et un ETF 'Dist' ?", opts: ["Acc est en dollars, Dist en euros", "Acc réinvestit les dividendes automatiquement, Dist les distribue en cash", "Acc a des frais plus élevés", "Il n'y a aucune différence"], correct: 1, exp: "Un ETF 'Accumulating' (Acc) réinvestit automatiquement les dividendes dans le fonds — effet boule de neige maximum. Un ETF 'Distributing' (Dist) te verse les dividendes en cash, ce qui génère un événement fiscal immédiat." },
+  { q: "Quel est le plafond de versement sur un PEA ?", opts: ["75 000€", "100 000€", "150 000€", "250 000€"], correct: 2, exp: "Le plafond de versement sur un PEA est de 150 000€ (pour un PEA classique). Attention : c'est le plafond de versements, pas de valorisation. Si ton PEA croît au-delà de 150k€, c'est normal." },
+  { q: "La 'flat tax' en France (PFU) est de quel taux ?", opts: ["17,2%", "24%", "30%", "45%"], correct: 2, exp: "La flat tax ou Prélèvement Forfaitaire Unique est de 30% : 12,8% d'impôt sur le revenu + 17,2% de prélèvements sociaux. Elle s'applique aux plus-values et dividendes sur les comptes-titres ordinaires." },
+  { q: "Quelle est l'erreur comportementale la plus courante chez les investisseurs ?", opts: ["Investir trop régulièrement", "Vendre en panique lors d'un krach et acheter par FOMO à la hausse", "Diversifier trop son portfolio", "Choisir des ETF à faibles frais"], correct: 1, exp: "Le risque comportemental est le plus dangereux. Vendre lors d'un krach 'pour limiter les pertes' cristallise les pertes et fait manquer le rebond. La solution : automatiser ses investissements et ne pas surveiller le portefeuille quotidiennement." },
+  { q: "Combien d'années faut-il pour doubler son capital à 8% de rendement annuel ?", opts: ["6 ans", "9 ans", "12 ans", "15 ans"], correct: 1, exp: "Règle des 72 : divise 72 par le taux de rendement pour obtenir le nombre d'années nécessaires pour doubler. 72 ÷ 8 = 9 ans. C'est la puissance des intérêts composés — ton argent double toutes les 9 ans à 8% de rendement." }
+];
+
+let qIdx = 0, score = 0, answered = false;
+
+function initQuiz() {
+  qIdx = 0; score = 0;
+  document.getElementById('quizContainer').style.display = '';
+  document.getElementById('quizResult').style.display = 'none';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = quizData[qIdx];
+  document.getElementById('qLabel').textContent = `Question ${qIdx + 1} / ${quizData.length}`;
+  document.getElementById('qScore').textContent = `Score : ${score}`;
+  document.getElementById('qScoreDisplay').textContent = `${score} / ${qIdx}`;
+  document.getElementById('qProgress').style.width = `${((qIdx + 1) / quizData.length) * 100}%`;
+  document.getElementById('quizQ').textContent = q.q;
+  document.getElementById('quizExplanation').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  const letters = ['A', 'B', 'C', 'D'];
+  document.getElementById('quizOptions').innerHTML = q.opts.map((opt, i) =>
+    `<button class="quiz-option" onclick="selectAnswer(${i})">
+      <span class="option-letter">${letters[i]}</span>${opt}
+    </button>`
+  ).join('');
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = quizData[qIdx];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach((o, i) => {
+    o.classList.add('disabled');
+    if (i === q.correct) o.classList.add('correct');
+    else if (i === idx) o.classList.add('wrong');
+  });
+  if (idx === q.correct) score++;
+  const exp = document.getElementById('quizExplanation');
+  exp.style.display = 'block';
+  exp.style.background = idx === q.correct ? 'var(--green-light)' : 'var(--red-light)';
+  exp.style.color = idx === q.correct ? 'var(--green)' : 'var(--red)';
+  exp.innerHTML = `<strong>${idx === q.correct ? '✓ Correct !' : '✗ Incorrect'}</strong><br>${q.exp}`;
+  document.getElementById('nextBtn').style.display = '';
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx >= quizData.length) {
+    document.getElementById('quizContainer').style.display = 'none';
+    const res = document.getElementById('quizResult');
+    res.style.display = '';
+    document.getElementById('resultScore').textContent = `${score} / ${quizData.length}`;
+    const pct = score / quizData.length;
+    document.getElementById('resultEmoji').textContent = pct >= 0.8 ? '🏆' : pct >= 0.5 ? '👍' : '📚';
+    document.getElementById('resultTitle').textContent = pct >= 0.8 ? 'Excellent ! Tu maîtrises les bases.' : pct >= 0.5 ? 'Bon début ! Continue d\'apprendre.' : 'Continue d\'explorer InvestGuide !';
+    document.getElementById('resultDesc').textContent = `Tu as répondu correctement à ${score} question${score > 1 ? 's' : ''} sur ${quizData.length}. ${pct < 0.8 ? 'Explore les sections pour approfondir tes connaissances.' : 'Tu as de solides bases pour investir intelligemment.'}`;
+  } else {
+    renderQuestion();
+  }
+}
+
+function restartQuiz() { initQuiz(); }
+
+// ─── SIMULATEUR ───
+let simChartInst = null;
+
+function fmt(n) { return Math.round(n).toLocaleString('fr-FR') + ' €'; }
+function calcFV(monthly, rate, years, initial = 0) {
+  const r = rate / 100 / 12;
+  const fvMonthly = r === 0 ? monthly * years * 12 : monthly * ((Math.pow(1 + r, years * 12) - 1) / r);
+  const fvInitial = initial * Math.pow(1 + rate / 100, years);
+  return fvMonthly + fvInitial;
+}
+
+function setScenario(btn, m, r, a) {
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('simMontant').value = m;
+  document.getElementById('simTaux').value = r;
+  document.getElementById('simAge').value = a;
+  document.getElementById('simCapital').value = 0;
+  updateSim();
+}
+
+function updateSim() {
+  const m = parseFloat(document.getElementById('simMontant').value);
+  const r = parseFloat(document.getElementById('simTaux').value);
+  const age = parseInt(document.getElementById('simAge').value);
+  const cap = parseFloat(document.getElementById('simCapital').value);
+
+  document.getElementById('outMontant').textContent = fmt(m);
+  document.getElementById('outTaux').textContent = r + ' %';
+  document.getElementById('outAge').textContent = age + ' ans';
+  document.getElementById('outCapital').textContent = fmt(cap);
+
+  const horizons = [5, 10, 20, 30];
+  const results = horizons.map(y => ({ y, total: calcFV(m, r, y, cap), invested: m * y * 12 + cap }));
+
+  const stack = document.getElementById('resultStack');
+  if (!stack) return;
+  stack.innerHTML = results.map((res, i) => {
+    const gain = res.total - res.invested;
+    const mult = (res.total / res.invested).toFixed(1);
+    return `<div class="result-card ${i === 2 ? 'featured' : ''}">
+      <div class="rc-left">
+        <div class="rc-years">Dans ${res.y} ans</div>
+        <div class="rc-invested">${fmt(res.invested)} versés</div>
+      </div>
+      <div class="rc-right">
+        <div class="rc-amount" style="${i===2 ? 'color:var(--gold)' : ''}">${fmt(res.total)}</div>
+        <div class="rc-gain">+${fmt(gain)} de gains</div>
+        <div class="rc-multiple">×${mult} ton investissement</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Cost of waiting
+  const fv20 = calcFV(m, r, 20, cap);
+  const fv19 = calcFV(m, r, 19, cap);
+  const costEl = document.getElementById('costWait');
+  if (costEl) costEl.textContent = fmt(fv20 - fv19);
+
+  drawSimChart(m, r, cap);
+}
+
+function drawSimChart(monthly, rate, initial) {
+  const yrs = 30;
+  const labels = [], inv = [], tot = [];
+  for (let y = 0; y <= yrs; y++) {
+    labels.push(y === 0 ? 'Maintenant' : y % 5 === 0 ? `${y} ans` : '');
+    inv.push(Math.round(monthly * y * 12 + initial));
+    tot.push(y === 0 ? initial : Math.round(calcFV(monthly, rate, y, initial)));
+  }
+  const ctx = document.getElementById('simChart');
+  if (!ctx) return;
+  if (simChartInst) simChartInst.destroy();
+  simChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Valeur totale', data: tot, borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.08)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5 },
+        { label: 'Versements seuls', data: inv, borderColor: '#4A4860', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [5,5], fill: false, tension: 0, pointRadius: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Outfit', size: 11 }, color: '#8B899C', boxWidth: 12, padding: 16 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ' : ' + Math.round(ctx.parsed.y).toLocaleString('fr-FR') + ' €' } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: 'Outfit', size: 10 }, color: '#4A4860' } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: 'Outfit', size: 10 }, color: '#4A4860', callback: v => Math.round(v / 1000) + 'k €' } }
+      }
+    }
+  });
+}
+
+// ─── PORTFOLIO BUILDER ───
+let donutChartInst = null;
+
+const assetData = {
+  etf: { label: 'ETF Monde', color: '#4F8EF7', return: 8, risk: 3 },
+  fr: { label: 'Actions FR', color: '#7BB3F9', return: 7, risk: 4 },
+  gold: { label: 'Or', color: '#C9A84C', return: 7, risk: 3 },
+  oblig: { label: 'Obligations', color: '#F7A25F', return: 3, risk: 1 },
+  crypto: { label: 'Crypto', color: '#F75F5F', return: 15, risk: 9 }
+};
+
+function initPortfolio() { updatePortfolio(); }
+
+function updatePortfolio() {
+  const allocs = {};
+  let total = 0;
+  ['etf','fr','gold','oblig','crypto'].forEach(k => {
+    allocs[k] = parseInt(document.getElementById('a-' + k).value);
+    document.getElementById('p-' + k).textContent = allocs[k] + '%';
+    total += allocs[k];
+  });
+
+  const totalEl = document.getElementById('allocTotalVal');
+  if (totalEl) { totalEl.textContent = total + '%'; totalEl.className = 'alloc-total ' + (total === 100 ? 'ok' : 'over'); }
+
+  if (total > 0) {
+    let wReturn = 0, wRisk = 0;
+    Object.keys(allocs).forEach(k => { wReturn += (allocs[k] / total) * assetData[k].return; wRisk += (allocs[k] / total) * assetData[k].risk; });
+    const rendEl = document.getElementById('ps-rendement');
+    const risqEl = document.getElementById('ps-risque');
+    const profEl = document.getElementById('ps-profil');
+    if (rendEl) rendEl.textContent = wReturn.toFixed(1) + '%';
+    const riskLabel = wRisk < 3 ? 'Faible' : wRisk < 5 ? 'Modéré' : wRisk < 7 ? 'Élevé' : 'Très élevé';
+    const profLabel = wRisk < 3 ? 'Défensif' : wRisk < 5 ? 'Équilibré' : wRisk < 7 ? 'Dynamique' : 'Agressif';
+    if (risqEl) { risqEl.textContent = riskLabel; risqEl.style.color = wRisk < 3 ? 'var(--green)' : wRisk < 5 ? 'var(--amber)' : 'var(--red)'; }
+    if (profEl) profEl.textContent = profLabel;
+  }
+
+  drawDonut(allocs);
+}
+
+function drawDonut(allocs) {
+  const ctx = document.getElementById('donutChart');
+  if (!ctx) return;
+  const labels = [], data = [], colors = [];
+  Object.keys(allocs).forEach(k => { if (allocs[k] > 0) { labels.push(assetData[k].label); data.push(allocs[k]); colors.push(assetData[k].color); } });
+  if (donutChartInst) donutChartInst.destroy();
+  if (data.length === 0) return;
+  donutChartInst = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#12121E', borderWidth: 2, hoverOffset: 6 }] },
+    options: {
+      responsive: true, maintainAspectRatio: true, cutout: '60%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } } }
+    }
+  });
+  const legendEl = document.getElementById('donutLegend');
+  if (legendEl) legendEl.innerHTML = labels.map((l, i) => `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><div style="width:10px;height:10px;border-radius:2px;background:${colors[i]}"></div><span>${l}: <strong>${data[i]}%</strong></span></div>`).join('');
+}
+
+// ─── INIT ───
+document.getElementById('nav-actions').classList.add('active');
+document.getElementById('progressFill').style.width = '8%';
+document.getElementById('progressPct').textContent = '8%';
+</script>
+</body>
+</html>
